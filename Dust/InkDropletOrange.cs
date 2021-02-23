@@ -29,7 +29,6 @@ namespace SplatoonMod.Dust
             {
                 dust.active = false;
             }
-
             return false;
         }
 

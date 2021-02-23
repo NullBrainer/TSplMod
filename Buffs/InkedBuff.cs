@@ -28,4 +28,3 @@ namespace SplatoonMod.Buffs
         }
     }
 }
-//slow buffid = 32

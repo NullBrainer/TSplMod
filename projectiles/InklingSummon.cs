@@ -10,9 +10,8 @@ using Terraria.ID;
 
 namespace SplatoonMod.projectiles
 {
-    public abstract class InklingSummon : ModProjectile
+    public class InklingSummon : ModProjectile
     {
-        protected int FrameSpeed { get; private set; }
         protected InklingStates InklingState;
         protected Vector2 CenteroffSet;
         protected readonly float Gravity = 0.6f;
@@ -25,7 +24,7 @@ namespace SplatoonMod.projectiles
         protected bool foundTarget = false;
         protected readonly float FollowRange = 48f;
         protected readonly float MaxDistance = 480f;
-        protected int frameSpeed = 6;
+        protected int FrameSpeed = 6;
 
         protected void SetInklingState(InklingStates newstate)
         {
@@ -53,7 +52,7 @@ namespace SplatoonMod.projectiles
             projectile.minion = true;
             projectile.minionSlots = 1f;
             projectile.penetrate = -1;
-            InklingState = InklingStates.JUMPING;
+            SetInklingState(InklingStates.JUMPING);
             projectile.scale = 0.89f;
             drawOriginOffsetY = -30;
             drawOffsetX = -20;    
@@ -68,7 +67,7 @@ namespace SplatoonMod.projectiles
         }
 
         public override void AI()
-        {
+        {            
             Player player = Main.player[projectile.owner];
             projectile.velocity.Y += Gravity;
 
@@ -155,7 +154,7 @@ namespace SplatoonMod.projectiles
             if (foundTarget)
             {
                 projectile.velocity.X = Approach(target - projectile.Center).X;
-                InklingState = InklingStates.FOLLOWING;
+                SetInklingState(InklingStates.FOLLOWING);
                 if (projectile.Distance(target) <= 320f)
                 {
                     projectile.velocity.X = 0;
@@ -164,11 +163,11 @@ namespace SplatoonMod.projectiles
             }
             else if (InklingState == InklingStates.FLYING && distanceToIdlePosition <= 0f)
             {
-                InklingState = InklingStates.JUMPING;
+                SetInklingState(InklingStates.JUMPING);
             }
             else if (InklingState == InklingStates.JUMPING && projectile.oldVelocity.Y == 0 && distanceToIdlePosition <= 0f)
             {
-                InklingState = InklingStates.LAND;
+                SetInklingState(InklingStates.LAND);
                 projectile.velocity.X = 0f;
             }
             else if (distanceToIdlePosition > MaxDistance)
@@ -182,7 +181,7 @@ namespace SplatoonMod.projectiles
             else if (InklingState != InklingStates.IDLE && (projectile.velocity.X <= 1f && projectile.velocity.X >= -1f))
             {
                 projectile.velocity.X = 0f;
-                InklingState = InklingStates.IDLE;
+                SetInklingState(InklingStates.IDLE);
             }
             else
             {
@@ -195,7 +194,7 @@ namespace SplatoonMod.projectiles
             speed = newspeed;
             inertia = newinertia;
             projectile.velocity = Approach(vectorToIdlePosition);
-            InklingState = InklingStates.FLYING;
+            SetInklingState(InklingStates.FLYING);
 
         }
 
@@ -209,12 +208,12 @@ namespace SplatoonMod.projectiles
                 if (InklingState == InklingStates.IDLE)
                 {
                     projectile.velocity.X = (5f * RandomPosNeg());
-                    InklingState = InklingStates.FOLLOWING;
+                    SetInklingState(InklingStates.FOLLOWING);
                 }
                 else
                 {
                     projectile.velocity.X = 0;
-                    InklingState = InklingStates.IDLE;
+                    SetInklingState(InklingStates.IDLE);
                 }
             }
         }
@@ -237,7 +236,7 @@ namespace SplatoonMod.projectiles
         /// <param name="maxdistance"></param>
         protected virtual void FollowPlayer(float distanceToIdlePosition, Vector2 vectorToIdlePosition, float maxdistance)
         {
-            InklingState = InklingStates.FOLLOWING;
+            SetInklingState(InklingStates.FOLLOWING);
             if (distanceToIdlePosition > maxdistance)
             {
                 speed = 6f;
@@ -341,7 +340,7 @@ namespace SplatoonMod.projectiles
         /// <param name="targetposition"></param>
         protected virtual void Attack(Vector2 targetposition)
         {
-            InklingState = InklingStates.FIGHTING;
+            SetInklingState(InklingStates.FIGHTING);
 
             projectile.ai[0] += 1f;
             if (targetposition.X - projectile.Center.X < 0)
@@ -554,12 +553,12 @@ namespace SplatoonMod.projectiles
                         else
                             projectile.velocity.Y = -10.1f;
 
-                        InklingState = InklingStates.JUMPING;
+                        SetInklingState(InklingStates.JUMPING);
                     }
                     catch
                     {
                         projectile.velocity.Y = -10.1f;
-                        InklingState = InklingStates.JUMPING;
+                        SetInklingState(InklingStates.JUMPING);
                     }
 
 

@@ -9,48 +9,6 @@ namespace SplatoonMod.projectiles.SquidPhoneProj
 {
     public class SquidPhoneProj : InklingSummon
     {
-       
-
-
-        public override void SetStaticDefaults()
-        {
-            DisplayName.SetDefault("Inkling");
-            Main.projFrames[projectile.type] = 18;
-            ProjectileID.Sets.MinionTargettingFeature[projectile.type] = true;
-            Main.projPet[projectile.type] = true;
-            ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
-            ProjectileID.Sets.Homing[projectile.type] = true;
-            CenteroffSet = projectile.Center;
-        }
-
-        public override void SetDefaults()
-        {
-            projectile.netImportant = true;
-            projectile.width = 40;//66
-            projectile.height = 40; //70
-            projectile.tileCollide = true;
-            projectile.friendly = true;
-            projectile.minion = true;
-            projectile.minionSlots = 1f;
-            projectile.penetrate = -1;
-            SetInklingState(InklingStates.JUMPING);
-            projectile.scale = 0.89f;
-
-            drawOriginOffsetY = -30;
-            drawOffsetX = -20;
-
-            //            projectile.ignoreWater = true;           
-        }//arrow id is 1
-
-        public override bool? CanCutTiles()
-        {
-            return false;
-        }
-        public override bool MinionContactDamage()
-        {
-            return false;
-        }
-
         public override void AI()
         {
             Player player = Main.player[projectile.owner];

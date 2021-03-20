@@ -356,7 +356,7 @@ namespace SplatoonMod.projectiles
             {
                 projectile.ai[0] = 0f;
                 projectile.netUpdate = true;
-                Vector2 projVector = RandomSpread(16f, 16f, 25f);
+                Vector2 projVector = RandomSpread(16f, 16f, 20f);
 
                 targetposition.Y -= PositionOffset(targetposition);
                 projVector *= projectile.DirectionTo(targetposition);
@@ -393,7 +393,7 @@ namespace SplatoonMod.projectiles
             float ycomp = targetnpc.height;
             float magnitude = (float)Math.Sqrt((Xcomp * Xcomp) + (ycomp * ycomp));
             //20 tiles
-            return (magnitude * 0.16f) + (targetnpc.height * 0.25f);
+            return (magnitude * 0.16f);
         }
 
         /// <summary>
@@ -428,7 +428,7 @@ namespace SplatoonMod.projectiles
             {
                 projectile.frame = 3;
             }
-            else if (WithinValues(30f, angle, 60f) || WithinValues(120, angle, 150))
+            else if (WithinValues(30f, angle, 70f) || WithinValues(120, angle, 150))
             {
                 projectile.frame = 4;
             }

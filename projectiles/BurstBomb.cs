@@ -13,8 +13,8 @@ namespace SplatoonMod.projectiles
         public override void SetDefaults()
         {
             projectile.arrow = true;
-            projectile.width = 30;
-            projectile.height = 30;
+            projectile.width = 20;
+            projectile.height = 20;
             projectile.aiStyle = 1;
             projectile.ranged = true;
             projectile.friendly = true;
@@ -24,7 +24,7 @@ namespace SplatoonMod.projectiles
         public override void AI()
         {
             projectile.rotation *= 0.5f;
-            projectile.velocity.Y += 0.1f;
+            projectile.velocity.Y += 0.3f;
             if (projectile.velocity.Y > 16f)
             {
                 projectile.velocity.Y = 16f;
@@ -47,9 +47,11 @@ namespace SplatoonMod.projectiles
             for (int i = 0; i < 50; i++)
             {
                 int dustIndex = Terraria.Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, ModContent.DustType<InkDropletOrange>(), 0f, 0f, 100, default(Color), 2f);
-                Main.dust[dustIndex].velocity.X = 1f;
-                Main.dust[dustIndex].velocity *= 5f;
-                Main.dust[dustIndex].scale = 5f;
+                Main.dust[dustIndex].velocity.X = Main.rand.NextFloat(-1,1);
+                Main.dust[dustIndex].velocity.Y *= -1;
+                Main.dust[dustIndex].velocity *= 2.5f;
+                Main.dust[dustIndex].fadeIn = 3f;
+                Main.dust[dustIndex].scale = 1f;
             }
             
         }

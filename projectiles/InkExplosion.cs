@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using SplatoonMod.Buffs;
 using System;
 using System.Collections.Generic;
 using Terraria;
@@ -24,5 +25,12 @@ namespace SplatoonMod.projectiles
             projectile.velocity = new Vector2(0f, 0f);
 
         }
+
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            target.AddBuff(ModContent.BuffType<InkedBuff>(), 300, false);
+
+        }
+
     }
 }

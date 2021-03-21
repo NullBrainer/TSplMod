@@ -25,6 +25,9 @@ namespace SplatoonMod.projectiles
         protected readonly float FollowRange = 48f;
         protected readonly float MaxDistance = 480f;
         protected int FrameSpeed = 6;
+        protected bool SubActive = false;
+
+
 
         protected void SetInklingState(InklingStates newstate)
         {
@@ -34,7 +37,7 @@ namespace SplatoonMod.projectiles
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Inkling");
-            Main.projFrames[projectile.type] = 18;
+            Main.projFrames[projectile.type] = 22;
             ProjectileID.Sets.MinionTargettingFeature[projectile.type] = true;
             Main.projPet[projectile.type] = true;
             ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
@@ -44,6 +47,7 @@ namespace SplatoonMod.projectiles
 
         public override void SetDefaults()
         {
+
             projectile.netImportant = true;
             projectile.width = 40;//66
             projectile.height = 40; //70
@@ -53,9 +57,9 @@ namespace SplatoonMod.projectiles
             projectile.minionSlots = 1f;
             projectile.penetrate = -1;
             SetInklingState(InklingStates.JUMPING);
-            projectile.scale = 0.89f;
-            drawOriginOffsetY = -30;
-            drawOffsetX = -20;    
+            //            projectile.scale = 0.89f;
+            drawOriginOffsetY = -19;
+            drawOffsetX = -20;
         }
         public override bool? CanCutTiles()
         {
@@ -67,7 +71,7 @@ namespace SplatoonMod.projectiles
         }
 
         public override void AI()
-        {            
+        {
             Player player = Main.player[projectile.owner];
             projectile.velocity.Y += Gravity;
 
@@ -119,8 +123,23 @@ namespace SplatoonMod.projectiles
 
             speed = 5f;
             inertia = 3f;
+            if (!SubActive)
+            {
+                SubActive = Main.rand.Next(1,100) == 1;
+            }
             SetStates(player, distanceToIdlePosition, vectorToIdlePosition);
             Animate(InklingState);
+            ResetConditions();
+
+
+        }
+        protected virtual void ResetConditions()
+        {
+            if (projectile.frame == 20)
+            {
+                SubActive = false;
+            }
+            FrameSpeed = 6;
         }
         protected virtual void UpdateInklingFlying(Vector2 playerposition)
         {
@@ -144,6 +163,8 @@ namespace SplatoonMod.projectiles
         protected virtual void SetStates(Player player, float distanceToIdlePosition, Vector2 vectorToIdlePosition)
         {
             float StepSpeed = 2f, gfxOffY = 0f;
+            
+
             Collision.StepUp(ref projectile.position, ref projectile.velocity, projectile.width, projectile.height, ref StepSpeed, ref gfxOffY);
             Vector4 SlopedCollision = Collision.SlopeCollision(projectile.position, projectile.velocity, projectile.width, projectile.height, 1f, false);
 
@@ -158,7 +179,19 @@ namespace SplatoonMod.projectiles
                 if (projectile.Distance(target) <= 320f)
                 {
                     projectile.velocity.X = 0;
-                    Attack(target);
+                    if (SubActive)
+                    {
+                        SetInklingState(InklingStates.SUB);                      
+                        Attack(target, 20f);
+
+                    }
+                    else
+                    {
+                        SetInklingState(InklingStates.FIGHTING);
+                        Attack(target, 6f);
+                    }
+                    
+
                 }
             }
             else if (InklingState == InklingStates.FLYING && distanceToIdlePosition <= 0f)
@@ -338,11 +371,11 @@ namespace SplatoonMod.projectiles
         /// Projectile spawning that includes sprite adjustment
         /// </summary>
         /// <param name="targetposition"></param>
-        protected virtual void Attack(Vector2 targetposition)
+        protected virtual void Attack(Vector2 targetposition, float Cooldown)
         {
-            SetInklingState(InklingStates.FIGHTING);
 
             projectile.ai[0] += 1f;
+
             if (targetposition.X - projectile.Center.X < 0)
             {
                 projectile.direction = -1;
@@ -352,7 +385,8 @@ namespace SplatoonMod.projectiles
                 projectile.direction = 1;
             }
             projectile.spriteDirection = projectile.direction;
-            if (projectile.ai[0] >= 6f)
+           
+            if (projectile.ai[0] >= Cooldown)
             {
                 projectile.ai[0] = 0f;
                 projectile.netUpdate = true;
@@ -371,10 +405,26 @@ namespace SplatoonMod.projectiles
                     CenteroffSet.X -= 10f;
                 }
 
-                Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Shooter0" + Main.rand.Next(0, 2)), 0.5f);
-                Projectile.NewProjectile(CenteroffSet, projVector, ModContent.ProjectileType<SplatterShotProjectile>(), projectile.damage, projectile.knockBack, projectile.owner);
-                TargetingAngle = DegreeToRad(projectile.DirectionTo(targetposition).ToRotation());
+                if (SubActive)
+                {
+                    SetInklingState(InklingStates.SUB);
+                }
+                switch (InklingState)
+                {
+                    case InklingStates.FIGHTING:
+                        DefaultAttack(projVector, targetposition);
+                        break;
+                    case InklingStates.SUB:
+                        SubAttack(projVector, targetposition);
+                        break;
+                    case InklingStates.SPECIAL:
+                        break;
+                    default:
+                        break;
+                }
+
             }
+
         }
 
         protected float DegreeToRad(float Degree)
@@ -438,9 +488,27 @@ namespace SplatoonMod.projectiles
             }
         }
 
+        protected virtual void DefaultAttack(Vector2 projVector, Vector2 targetposition)
+        {
+            Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Shooter0" + Main.rand.Next(0, 2)), 0.5f);
+            Projectile.NewProjectile(CenteroffSet, projVector, ModContent.ProjectileType<SplatterShotProjectile>(), projectile.damage, projectile.knockBack, projectile.owner);
+            TargetingAngle = DegreeToRad(projectile.DirectionTo(targetposition).ToRotation());
+        }
+        protected virtual void SubAttack(Vector2 projVector, Vector2 targetposition)
+        {
+            Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BombFly"), 0.5f);
+            Projectile.NewProjectile(CenteroffSet, projVector, ModContent.ProjectileType<BurstBomb>(), (projectile.damage * 2), projectile.knockBack, projectile.owner);
+        }
+
+        /* protected virtual void SpecialAttack()
+         {
+             PlayerAnimation(20, 22);
+         }
+        */
+
         protected static Vector2 RandomSpread(float speedX, float speedY, float angle)
         {
-            
+
             float spread = (float)(angle * 0.0174532925);
             float baseSpeed = (float)System.Math.Sqrt(speedX * speedX + speedY * speedY);
             double baseAngle = System.Math.Atan2(speedX, speedY);
@@ -477,7 +545,11 @@ namespace SplatoonMod.projectiles
                     SetAttackAnimation(TargetingAngle);
                     break;
                 case InklingStates.FLYING:
-                    PlayerAnimation(14, 17);
+                    PlayerAnimation(14, 15);
+                    break;
+                case InklingStates.SUB:
+                    FrameSpeed = 12;
+                    PlayerAnimation(18, 20);
                     break;
                 default:
                     break;

@@ -13,7 +13,9 @@ namespace SplatoonMod.projectiles
         FIGHTING,
         JUMPING,
         LAND,
-        FLYING
+        FLYING,
+        SUB,
+        SPECIAL
 
 
 

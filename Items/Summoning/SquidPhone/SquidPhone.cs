@@ -46,9 +46,10 @@ namespace SplatoonMod.Items.Summoning.SquidPhone
 
         public override bool Shoot(Player player, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack)
         {
-            player.AddBuff(item.buffType, 2);
+            player.AddBuff(item.buffType, 2,true);
             position = Main.MouseWorld;
-            return true;
+            Projectile.NewProjectile(position, Vector2.Zero, ModContent.ProjectileType<SquidPhoneProj>(), damage, knockBack, player.whoAmI);
+            return false;
 
         }
 

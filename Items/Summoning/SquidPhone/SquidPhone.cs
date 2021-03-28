@@ -22,7 +22,7 @@ namespace SplatoonMod.Items.Summoning.SquidPhone
         }
         public override void SetDefaults()
         {
-            item.damage = 5;
+            item.damage = 15;
             item.knockBack = 2.5f;
             item.mana = 10;
             item.width = 25;
@@ -33,7 +33,6 @@ namespace SplatoonMod.Items.Summoning.SquidPhone
             item.rare = ItemRarityID.Orange;
             item.UseSound = SoundID.Item44;
             item.value = Terraria.Item.buyPrice(0,10,60,0);
-            item.melee = false;
 
             item.noMelee = true;
             item.summon = true;
@@ -41,7 +40,7 @@ namespace SplatoonMod.Items.Summoning.SquidPhone
             item.shoot = ModContent.ProjectileType<SquidPhoneProj>();
 
             
-            base.SetDefaults();
+//            base.SetDefaults();
         }
 
         public override bool Shoot(Player player, ref Vector2 position, ref float speedX, ref float speedY, ref int type, ref int damage, ref float knockBack)
@@ -49,7 +48,7 @@ namespace SplatoonMod.Items.Summoning.SquidPhone
             player.AddBuff(item.buffType, 2,true);
             position = Main.MouseWorld;
             Projectile.NewProjectile(position, Vector2.Zero, ModContent.ProjectileType<SquidPhoneProj>(), damage, knockBack, player.whoAmI);
-            return false;
+            return true;
 
         }
 

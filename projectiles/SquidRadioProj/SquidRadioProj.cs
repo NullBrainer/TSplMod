@@ -11,7 +11,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
     public class SquidRadioProj : InklingSummon
     {
 
-        public override void AI()
+       /* public override void AI()
         {
             Player player = Main.player[projectile.owner];
             projectile.velocity.Y += Gravity;
@@ -59,10 +59,10 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             SetStates(player, distanceToIdlePosition, vectorToIdlePosition);
             Animate(InklingState);
         }
-
+        */
         private void Move(float newspeed, float newinertia, Vector2 vectorToIdlePosition)
         {
-            SetInklingState( InklingStates.FOLLOWING);
+            SetInklingState( InklingStates.MOVING);
             speed = newspeed;
             inertia = newinertia;
             projectile.velocity.X = Approach(vectorToIdlePosition).X;

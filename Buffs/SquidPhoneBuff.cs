@@ -18,6 +18,7 @@ namespace SplatoonMod.Buffs
             Description.SetDefault("The Inkling will fight for you.");
             Main.buffNoSave[Type] = true;
             Main.buffNoTimeDisplay[Type] = true;
+
         }
 
         public override void Update(Player player, ref int buffIndex)

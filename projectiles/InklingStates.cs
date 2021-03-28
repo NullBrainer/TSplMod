@@ -9,7 +9,7 @@ namespace SplatoonMod.projectiles
     public enum InklingStates
     {
         IDLE,
-        FOLLOWING,
+        MOVING,
         FIGHTING,
         JUMPING,
         LAND,

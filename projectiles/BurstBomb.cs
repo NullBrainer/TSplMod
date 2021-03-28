@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using SplatoonMod.Buffs;
 using SplatoonMod.Dust;
 using Terraria;
 using Terraria.ID;
@@ -10,50 +11,80 @@ namespace SplatoonMod.projectiles
 {
     public class BurstBomb : ModProjectile
     {
+        public Vector2 oldpos;
+
         public override void SetDefaults()
         {
-            projectile.arrow = true;
+            //projectile.arrow = true;
             projectile.width = 20;
             projectile.height = 20;
-            projectile.aiStyle = 1;
+            projectile.aiStyle = 0;
             projectile.ranged = true;
             projectile.friendly = true;
-            projectile.penetrate = 1;
+            projectile.penetrate = -1;
             projectile.ignoreWater = false;
+            drawOffsetX = 1;
+            drawOriginOffsetY = -9;
         }
         public override void AI()
         {
-            projectile.rotation *= 0.5f;
+            projectile.rotation *= 5f;
             projectile.velocity.Y += 0.3f;
             if (projectile.velocity.Y > 16f)
             {
                 projectile.velocity.Y = 16f;
             }
-            base.AI();
         }
+
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            if (projectile.Hitbox.Intersects(target.Hitbox))
+            {
+            PreKill(1);
+            }
+            projectile.active = false;
+        }
+
+        public override bool PreKill(int timeLeft)
+        {
+            Vector2 oldpos = projectile.oldPosition;
+            Explode(oldpos);
+            BombEffects();
+            return base.PreKill(timeLeft);
+        }
+
+
         public override void Kill(int timeLeft)
         {
-
-            Explode();
+            projectile.active = false;
         }
-
-        private void Explode()
+        private void BombEffects()
         {
-            Main.PlaySound(SoundLoader.customSoundType, projectile.position, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BurstBombExplosion"));
-
-            Vector2 vel = new Vector2(0f, 0f);
-            Projectile.NewProjectile(projectile.Center, vel, ModContent.ProjectileType<InkExplosion>(), projectile.damage, projectile.knockBack, projectile.owner, 0, 1);
-
+            Main.PlaySound(SoundLoader.customSoundType, oldpos, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BurstBombExplosion"));
             for (int i = 0; i < 50; i++)
             {
-                int dustIndex = Terraria.Dust.NewDust(new Vector2(projectile.position.X, projectile.position.Y), projectile.width, projectile.height, ModContent.DustType<InkDropletOrange>(), 0f, 0f, 100, default(Color), 2f);
-                Main.dust[dustIndex].velocity.X = Main.rand.NextFloat(-1,1);
-                Main.dust[dustIndex].velocity.Y *= -1;
+                int dustIndex = Terraria.Dust.NewDust(oldpos, (projectile.width / 2), (projectile.height / 2), ModContent.DustType<InkDropletOrange>(), 0f, 0f, 100, default(Color), 2f);
+                Main.dust[dustIndex].velocity.X = Main.rand.NextFloat(-1, 1);
+                Main.dust[dustIndex].velocity.Y *= Main.rand.NextFloat(-1, 1);
                 Main.dust[dustIndex].velocity *= 2.5f;
-                Main.dust[dustIndex].fadeIn = 3f;
+                Main.dust[dustIndex].fadeIn = 5f;
                 Main.dust[dustIndex].scale = 1f;
             }
-            
+        }
+        private void Explode(Vector2 oldpos)
+        {
+            Vector2 vel = new Vector2(0f, 0f);
+            Projectile.NewProjectile(oldpos, vel, ModContent.ProjectileType<InkExplosion>(), projectile.damage, projectile.knockBack, projectile.owner, 0, 3);
+            Main.PlaySound(SoundLoader.customSoundType, oldpos, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BurstBombExplosion"));
+            for (int i = 0; i < 50; i++)
+            {
+                int dustIndex = Terraria.Dust.NewDust(oldpos, (projectile.width / 2), (projectile.height / 2), ModContent.DustType<InkDropletOrange>(), 0f, 0f, 100, default(Color), 2f);
+                Main.dust[dustIndex].velocity.X = Main.rand.NextFloat(-1, 1);
+                Main.dust[dustIndex].velocity.Y *= Main.rand.NextFloat(-1, 1);
+                Main.dust[dustIndex].velocity *= 2.5f;
+                Main.dust[dustIndex].fadeIn = 5f;
+                Main.dust[dustIndex].scale = 1f;
+            }
         }
     }
 }

@@ -22,7 +22,7 @@ namespace SplatoonMod.Items.Summoning.SquidPhone
         }
         public override void SetDefaults()
         {
-            item.damage = 15;
+            item.damage = 5;
             item.knockBack = 2.5f;
             item.mana = 10;
             item.width = 25;
@@ -38,8 +38,6 @@ namespace SplatoonMod.Items.Summoning.SquidPhone
             item.summon = true;
             item.buffType = ModContent.BuffType<SquidPhoneBuff>();
             item.shoot = ModContent.ProjectileType<SquidPhoneProj>();
-
-            
 //            base.SetDefaults();
         }
 

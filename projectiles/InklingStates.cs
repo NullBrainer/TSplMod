@@ -9,13 +9,16 @@ namespace SplatoonMod.projectiles
     public enum InklingStates
     {
         IDLE,
-        MOVING,
-        FIGHTING,
+        RUN,
+        FOLLOW,
+        PRIMARY,
         JUMPING,
         LAND,
         FLYING,
         SUB,
-        SPECIAL
+        SPECIAL,
+        ROLLER_UP,
+        ROLLER_DOWN
 
 
 

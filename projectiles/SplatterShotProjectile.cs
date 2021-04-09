@@ -21,7 +21,7 @@ namespace SplatoonMod.projectiles
             projectile.width = 10;
             projectile.height = 10;
             projectile.aiStyle = 1;
-            projectile.ranged = true;
+            projectile.minion = true;
             projectile.friendly = true;
             projectile.penetrate = 1;
             projectile.ignoreWater = false;
@@ -31,7 +31,6 @@ namespace SplatoonMod.projectiles
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
             target.AddBuff(ModContent.BuffType<InkedBuff>(), 300, false);
-            
         }
 
         public override void AI()

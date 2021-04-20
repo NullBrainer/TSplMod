@@ -49,6 +49,7 @@ namespace SplatoonMod.Items.Summoning.Agents.Agent_3
         {
             player.AddBuff(item.buffType, 2);
             position = Main.MouseWorld;
+            Projectile.NewProjectile(position, Vector2.Zero, ModContent.ProjectileType<SquidRadioProj>(), damage, knockBack, player.whoAmI);
             return true;
 
         }

@@ -20,8 +20,8 @@ namespace SplatoonMod.Buffs
 
         public override void Update(NPC npc, ref int buffIndex)
         {
-            npc.stepSpeed *= 0.5f;
-            npc.velocity.X *= 0.65f;
+            npc.stepSpeed *= 0.70f;
+            npc.velocity.X *= 0.70f;
             int dustid = Terraria.Dust.NewDust(npc.position, npc.width, npc.height, ModContent.DustType<InkDropletOrange>(), 0f, -3f, 0, default);
             Main.dust[dustid].noGravity = true;
             Main.dust[dustid].fadeIn = 5f;

@@ -62,9 +62,9 @@ namespace SplatoonMod.projectiles
             projectile.minionSlots = 1f;
             projectile.penetrate = -1;
             SetInklingState(InklingStates.JUMPING);
-            drawOriginOffsetY = -30;
+            drawOriginOffsetY = -35;
             drawOffsetX = -20;
-            projectile.scale = 0.65f;
+            projectile.scale = 0.80f;
             speed = 3f;
             inertia = 20f;
             maxspeed = 6f;
@@ -163,7 +163,7 @@ namespace SplatoonMod.projectiles
                 projectile.rotation = projectile.spriteDirection != 1
                 ? (float)Math.Atan2((double)projectile.velocity.Y, (double)projectile.velocity.X) + 3.14f
                 : (float)Math.Atan2((double)projectile.velocity.Y, (double)projectile.velocity.X);
-                projectile.tileCollide = false;//active only specific frames?
+                projectile.tileCollide = false;//active only specific frames? fuck off
 
             }
         }

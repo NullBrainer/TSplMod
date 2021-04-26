@@ -41,7 +41,7 @@ namespace SplatoonMod.projectiles
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Inkling_Girl");
-            Main.projFrames[projectile.type] = 22;
+            Main.projFrames[projectile.type] = 19;
             ProjectileID.Sets.MinionTargettingFeature[projectile.type] = true;
             Main.projPet[projectile.type] = true;
             ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
@@ -62,9 +62,8 @@ namespace SplatoonMod.projectiles
             projectile.minionSlots = 1f;
             projectile.penetrate = -1;
             SetInklingState(InklingStates.JUMPING);
-            drawOriginOffsetY = -35;
+            drawOriginOffsetY = -16;
             drawOffsetX = -20;
-            projectile.scale = 0.80f;
             speed = 3f;
             inertia = 20f;
             maxspeed = 6f;
@@ -467,7 +466,7 @@ namespace SplatoonMod.projectiles
                         SubAttack(projVector, targetposition, 17);
                         break;
                     case InklingStates.SPECIAL:
-                        SpecialAttack(projVector, targetposition, 20);
+                        SpecialAttack(projVector, targetposition, 17);
                         break;
                     default:
                         break;
@@ -627,7 +626,7 @@ namespace SplatoonMod.projectiles
                     break;
                 case InklingStates.SPECIAL:
                     FrameSpeed = 6;
-                    PlayerAnimation(19, 21);
+                    PlayerAnimation(16, 18);
                     break;
                 default:
                     break;

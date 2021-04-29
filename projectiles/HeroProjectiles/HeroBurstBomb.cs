@@ -7,7 +7,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace SplatoonMod.projectiles
+namespace SplatoonMod.projectiles.HeroProjectiles
 {
     public class HeroBurstBomb : ModProjectile
     {

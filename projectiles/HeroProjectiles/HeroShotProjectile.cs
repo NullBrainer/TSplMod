@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Terraria;
 using Terraria.ModLoader;
-namespace SplatoonMod.projectiles.Agent3Proj
+namespace SplatoonMod.projectiles.HeroProjectiles
 {
     public class HeroShotProjectile : ModProjectile
     {

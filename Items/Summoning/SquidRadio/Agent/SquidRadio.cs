@@ -12,7 +12,7 @@ using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
 
-namespace SplatoonMod.Items.Summoning.Agents.Agent_3
+namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
 {
     public class SquidRadio : ModItem
     {

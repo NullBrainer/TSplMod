@@ -1,6 +1,6 @@
 ﻿using Microsoft.Xna.Framework;
 using SplatoonMod.Buffs;
-using SplatoonMod.projectiles.Agent3Proj;
+using SplatoonMod.projectiles.HeroProjectiles;
 using System;
 using Terraria;
 using Terraria.ID;

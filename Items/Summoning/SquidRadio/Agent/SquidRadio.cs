@@ -16,6 +16,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
 {
     public class SquidRadio : ModItem
     {
+        private int[] Projectiles;
         public override void SetStaticDefaults()
         {
             Tooltip.SetDefault("Calls an Agent to fight for you.");
@@ -23,6 +24,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
         }
         public override void SetDefaults()
         {
+            Projectiles = new int[]{ ModContent.ProjectileType<SquidRadioProj>() , ModContent.ProjectileType<Agent1>()};
             item.damage = 35;
             item.knockBack = 2.5f;
             item.mana = 10;
@@ -40,7 +42,6 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
             item.summon = true;
             item.buffType = ModContent.BuffType<SquidRadioBuff>();
             item.shoot = ModContent.ProjectileType<SquidRadioProj>();
-
             
             base.SetDefaults();
         }
@@ -50,7 +51,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
             player.AddBuff(item.buffType, 2);
             position = Main.MouseWorld;
             Projectile.NewProjectile(position, Vector2.Zero, ModContent.ProjectileType<SquidRadioProj>(), damage, knockBack, player.whoAmI);
-            return true;
+            return false;
 
         }
 

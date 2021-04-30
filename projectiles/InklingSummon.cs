@@ -217,19 +217,19 @@ namespace SplatoonMod.projectiles
                         if (SpecialActive(specialReq))
                         {
                             SetInklingState(InklingStates.SPECIAL);
-                            TimedAttack(target, 6f);
+                            TimedAttack(target, 6f, 17, 17);
                         }
                         else
                         {
                             if (SubActive)
                             {
                                 SetInklingState(InklingStates.SUB);
-                                TimedAttack(target, 6f);
+                                TimedAttack(target, 6f, 17, 17);
                             }
                             else
                             {
                                 SetInklingState(InklingStates.PRIMARY);
-                                TimedAttack(target, 6f);
+                                TimedAttack(target, 6f, 17, 17);
                             }
                         }
                     }
@@ -425,7 +425,7 @@ namespace SplatoonMod.projectiles
         /// Projectile spawning that includes sprite adjustment
         /// </summary>
         /// <param name="targetposition"></param>
-        protected virtual void TimedAttack(Vector2 targetposition, float Cooldown)
+        protected virtual void TimedAttack(Vector2 targetposition, float Cooldown,int subthrowframe, int specialthrowframe)
         {
 
             projectile.ai[0] += 1f;
@@ -463,17 +463,16 @@ namespace SplatoonMod.projectiles
                         DefaultAttack(projVector, targetposition);
                         break;
                     case InklingStates.SUB:
-                        SubAttack(projVector, targetposition, 17);
+                        SubAttack(projVector, targetposition, subthrowframe);
                         break;
                     case InklingStates.SPECIAL:
-                        SpecialAttack(projVector, targetposition, 17);
+                        SpecialAttack(projVector, targetposition, specialthrowframe);
                         break;
                     default:
                         break;
                 }
             }
         }
-
 
         protected float DegreeToRad(float Degree)
         {

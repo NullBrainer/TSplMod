@@ -17,7 +17,6 @@ namespace SplatoonMod.projectiles
         FLYING,
         SUB,
         SPECIAL,
-        ROLLER_UP,
         ROLLER_DOWN
 
 

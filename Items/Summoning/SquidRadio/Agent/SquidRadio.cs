@@ -25,7 +25,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
         public override void SetDefaults()
         {
             Projectiles = new int[]{ ModContent.ProjectileType<SquidRadioProj>() , ModContent.ProjectileType<Agent1>()};
-            item.damage = 35;
+            item.damage = 5;
             item.knockBack = 2.5f;
             item.mana = 10;
             item.width = 25;
@@ -34,7 +34,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
             item.useAnimation = 35;
             item.useStyle = ItemUseStyleID.HoldingUp;
             item.rare = ItemRarityID.Orange;
-            item.UseSound = SoundID.Item44;
+            item.UseSound = mod.GetLegacySoundSlot(SoundType.Custom, "Sounds/Inkling/SquidRadio");
             item.value = Terraria.Item.buyPrice(0,10,60,0);
             item.melee = false;
 
@@ -50,9 +50,10 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
         {
             player.AddBuff(item.buffType, 2);
             position = Main.MouseWorld;
-            Projectile.NewProjectile(position, Vector2.Zero, ModContent.ProjectileType<SquidRadioProj>(), damage, knockBack, player.whoAmI);
-            return false;
 
+           
+            Projectile.NewProjectile(position, Vector2.Zero, ModContent.ProjectileType<Agent1>(), damage, knockBack, player.whoAmI);
+            return false;
         }
 
         public override void AddRecipes()

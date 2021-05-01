@@ -19,7 +19,7 @@ namespace SplatoonMod.projectiles
         protected readonly float TerminalVelocity = 10f;
         protected int SquidBuffType;
         protected float TargetingAngle;
-        protected float speed, inertia, maxspeed;
+        protected float speed, inertia, maxspeed, defaultInertia,defaultspeed;
         protected Vector2 target;
         protected NPC targetnpc;
         protected bool foundTarget = false;
@@ -65,8 +65,10 @@ namespace SplatoonMod.projectiles
             drawOriginOffsetY = -16;
             drawOffsetX = -20;
             speed = 3f;
+            defaultInertia = 20f;
             inertia = 20f;
             maxspeed = 6f;
+            defaultspeed = 5f;
         }
 
         
@@ -143,8 +145,12 @@ namespace SplatoonMod.projectiles
             {
                 speed = maxspeed;
             }
+            else
+            {
+                speed = defaultspeed;
+            }
             FrameSpeed = 7;            
-            inertia = 20f;
+            inertia = defaultInertia;
         }
         protected virtual void UpdateInklingFlying(Vector2 playerposition, float distanceToIdlePosition)
         {
@@ -310,14 +316,14 @@ namespace SplatoonMod.projectiles
             }
             if (projectile.velocity.X > 4f || projectile.velocity.X < -4f)
             {
-                FrameSpeed = 6;
+                FrameSpeed = 5;
             }else if (projectile.velocity.X > 2f || projectile.velocity.X < -2f)
             {
-                FrameSpeed = 9;
+                FrameSpeed = 7;
             }
             else
             {
-                FrameSpeed = 12;
+                FrameSpeed = 10;
             }
             if (projectile.velocity.X > 1f || projectile.velocity.X < -1f)
             {
@@ -333,7 +339,7 @@ namespace SplatoonMod.projectiles
                 {
                     projectile.direction = -1;
                 }
-                projectile.velocity.X = projectile.direction*1.25f;
+                projectile.velocity.X = projectile.direction*1.05f;
             }
         }
 
@@ -673,7 +679,7 @@ namespace SplatoonMod.projectiles
             }
         }
 
-
+        
 
         /// <summary>
         /// Tile detection and vertical adjustment over obstacles
@@ -733,7 +739,7 @@ namespace SplatoonMod.projectiles
 
                     if (projectile.type == (int)sbyte.MaxValue)
                         projectile.ai[0] = 1f;
-                }
+                }                
             }
         }
 

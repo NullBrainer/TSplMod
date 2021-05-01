@@ -10,6 +10,12 @@ namespace SplatoonMod.projectiles.SquidRadioProj
 {
     public class Agent1 : InklingSummon
     {
+        
+        public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
+        {
+            target.AddBuff(ModContent.BuffType<Agent1Debuff>(), 300, false);
+
+        }
         public override void AI()
         {
             SquidBuffType = ModContent.BuffType<SquidRadioBuff>();
@@ -28,13 +34,14 @@ namespace SplatoonMod.projectiles.SquidRadioProj
 
         public override void SetDefaults()
         {
-            projectile.netImportant = true;
-            projectile.width = 50;//66
-            projectile.height = 50; //70
-            drawOriginOffsetY = -45;
-            drawOffsetX = -30;
-            maxspeed = 9f;
             base.SetDefaults();
+            projectile.netImportant = true;
+            projectile.width = 45;//66
+            projectile.height = 45; //70
+            drawOriginOffsetY = -40;
+            drawOffsetX = -20;
+            maxspeed = 10f;
+            defaultInertia = 20f;
         }
         protected override void SetStates(Player player, float distanceToIdlePosition, Vector2 vectorToIdlePosition)
         {
@@ -43,24 +50,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             projectile.position = SlopedCollision.XY();
             projectile.velocity = SlopedCollision.ZW();
 
-            switch (InklingState)
-            {
-                case InklingStates.FOLLOW:
-                    JumpOverTiles();
-                    FollowPlayer(distanceToIdlePosition, vectorToIdlePosition, FollowRange);
-                    break;
-                case InklingStates.IDLE:
-                    projectile.velocity.X = 0f;
-                    break;
-                case InklingStates.LAND:
-                    projectile.velocity.X = 0;
-                    break;
-                case InklingStates.FLYING:
-                    UpdateInklingFlying(vectorToIdlePosition, distanceToIdlePosition);
-                    break;
-                default:
-                    break;
-            }
+            CheckConditions(player, distanceToIdlePosition, vectorToIdlePosition);
             if (distanceToIdlePosition > MaxDistance)
             {
                 SetInklingState(InklingStates.FLYING);
@@ -69,41 +59,12 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
                 if (foundTarget)
                 {
-                   
-                    if (SpecialActive(specialReq))
-                    {
-                        projectile.ai[1] += 1f;
-                        if (projectile.ai[1] >= 360f)
-                        {
-                            specialCounter = 0;
-                            projectile.ai[1] = 0f;
-                        }
-                    }
-                    if (Vector2.Distance(projectile.Center,target) < 32f)
-                    {
-                        projectile.velocity.X = 0f;
-                        SetInklingState(InklingStates.PRIMARY);
-                        TimedAttack(target, 7f, 20, 23);
-                    }
-                    else if ((Math.Abs(projectile.position.X - target.X) <= 320f) && Math.Abs(projectile.position.Y - target.Y) <= projectile.Distance(target))
-                    {
-                        projectile.velocity.X = 0;
-                        if (SpecialActive(specialReq))
-                        {
-                            SetInklingState(InklingStates.SPECIAL);
-                            TimedAttack(target, 6f, 20, 23);
-                        }
-                        else
-                        {
-                            if (SubActive)
-                            {
-                                SetInklingState(InklingStates.SUB);
-                                TimedAttack(target, 6f, 20, 23);
-                            }                         
-                        }
-                    }
                     SetInklingState(InklingStates.ROLLER_DOWN);
-                    projectile.velocity.X = Approach(target - projectile.Center).X;
+                    if (Vector2.Distance(projectile.Center, target) < 64f && (projectile.velocity.X < 1.5f && projectile.velocity.X > -1.5f))
+                    {
+                        SetInklingState(InklingStates.PRIMARY);
+                    }
+
                 }
                 else if ((projectile.velocity.Y > 5f || projectile.velocity.Y < -5f) && (projectile.velocity.X < 1f || projectile.velocity.X > -1f))
                 {
@@ -119,26 +80,76 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 }
 
             }
+            
 
         }
+        protected void CheckConditions(Player player, float distanceToIdlePosition, Vector2 vectorToIdlePosition)
+        {
+            switch (InklingState)
+            {
+                case InklingStates.IDLE:
+                    projectile.velocity.X = 0f;
+                    break;
+                case InklingStates.RUN:
+                    break;
+                case InklingStates.FOLLOW:
+                    JumpOverTiles();
+                    FollowPlayer(distanceToIdlePosition, vectorToIdlePosition, FollowRange);
+                    break;
+                case InklingStates.PRIMARY:
+                    projectile.velocity.X = projectile.direction * 0.01f;
+                    TimedAttack(target, 20f, 20, 23);
+                    break;
+                case InklingStates.JUMPING:
+                    break;
+                case InklingStates.LAND:
+                    projectile.velocity.X = 0;
+                    break;
+                case InklingStates.FLYING:
+                    UpdateInklingFlying(vectorToIdlePosition, distanceToIdlePosition);
+                    break;
+                case InklingStates.SUB:
+                    break;
+                case InklingStates.SPECIAL:
+                    break;
+                case InklingStates.ROLLER_DOWN:
+                    speed = 10f;
+                    inertia = 30f;
+                    projectile.velocity.X = Approach(target - projectile.Center).X;
+                    break;
+                default:
+                    break;
+            }
 
+        }
         public override bool MinionContactDamage()
         {
-            return InklingState == InklingStates.ROLLER_DOWN;
+            return InklingState == InklingStates.ROLLER_DOWN && (projectile.velocity.X > 5f || projectile.velocity.X < -5f);
         }
 
         protected override void DefaultAttack(Vector2 projVector, Vector2 targetposition)
         {
-            specialCounter++;
-            if(projectile.frame == 20){
-                Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/RollerLift"), 0.5f);
+            if (projectile.direction < 0)
+            {
+                CenteroffSet.X -= 25f;
             }
-            else if (projectile.frame == 21)
+            else
+            {
+                CenteroffSet.X += 25f;
+            }
+            specialCounter++;
+            if (projectile.frame == 1)
+            {
+                Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/RollerLift"), 0.5f);
+
+            }
+            if (projectile.frame == 2)
             {
                 Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/RollerSwing"), 0.5f);
-                Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/PlayerRollerWeaponSpray" + Main.rand.Next(0, 3)), 0.5f);
-                Projectile.NewProjectile(CenteroffSet, projVector, ModContent.ProjectileType<HeroShotProjectile>(), projectile.damage, projectile.knockBack, projectile.owner);
+                Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/PlayerWeaponRollerSpray" + Main.rand.Next(0, 3)), 0.5f);
+                Projectile.NewProjectile(CenteroffSet, Vector2.Zero, ModContent.ProjectileType<HeroRollerSwingProjectile>(), 20, 10f, projectile.owner);
             }
+
         }
 
         protected override void SubAttack(Vector2 projVector, Vector2 targetposition, int throwingframe)
@@ -184,10 +195,11 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     }
                     break;
                 case InklingStates.PRIMARY:
-                    PlayerAnimation(1, 3);
+                    FrameSpeed = 20;
+                    AnimateState(0, 3, InklingStates.ROLLER_DOWN);
                     break;
                 case InklingStates.JUMPING:
-                    projectile.frame = 17;
+                    projectile.frame = 16;
                     break;
                 case InklingStates.LAND:
                     break;
@@ -198,21 +210,56 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     PlayerAnimation(19, 21);
                     break;
                 case InklingStates.SPECIAL:
-                    PlayerAnimation(22,24);
-                    break;
-                case InklingStates.ROLLER_UP:
-                    if (projectile.velocity.X != 0f)
-                    {
-                        projectile.spriteDirection = projectile.direction;
-                        PlayerAnimation(4, 9);
-                    }
-                    break;
+                    PlayerAnimation(22, 24);
+                    break;                
                 case InklingStates.ROLLER_DOWN:
+                    FrameSpeedOnVelocity();
                     projectile.spriteDirection = projectile.direction;
                     PlayerAnimation(10, 15);
                     break;
                 default:
                     break;
+            }
+        }
+        private void AnimateState(int startframe, int endframe, InklingStates newstate)
+        {
+
+            if (projectile.frame <= startframe || projectile.frame > endframe)
+            {
+                projectile.frame = startframe;
+            }
+            projectile.frameCounter++;
+            if (projectile.frameCounter >= FrameSpeed)
+            {
+                projectile.frameCounter = 0;
+                if (projectile.frame < endframe)
+                {
+                    projectile.frame++;
+                }
+                else if (projectile.frame == endframe)
+                {
+                    projectile.frame = startframe;
+                    SetInklingState(newstate);
+                }
+            }
+        }
+        private void FrameSpeedOnVelocity()
+        {
+            if (projectile.velocity.X < -8f || projectile.velocity.X > 8f)
+            {
+                FrameSpeed = 4;
+            }
+            else if (projectile.velocity.X < -5f || projectile.velocity.X > 5f)
+            {
+                FrameSpeed = 6;
+            }
+            else if (projectile.velocity.X < -3f || projectile.velocity.X > 3f)
+            {
+                FrameSpeed = 8;
+            }
+            else if (projectile.velocity.X > -1f && projectile.velocity.X < 1f)
+            {
+                FrameSpeed = 24;
             }
         }
 

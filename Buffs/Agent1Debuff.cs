@@ -5,7 +5,7 @@ using Terraria.ModLoader;
 
 namespace SplatoonMod.Buffs
 {
-    public class H_InkedBuff : ModBuff
+    public class Agent1Debuff : ModBuff
     {
         public override void SetDefaults()
         {
@@ -20,7 +20,7 @@ namespace SplatoonMod.Buffs
         {
             npc.stepSpeed *= 0.65f;
             npc.velocity.X *= 0.65f;
-            int dustid = Terraria.Dust.NewDust(npc.position, npc.width, npc.height, ModContent.DustType<InkDroplet>(), 0f, -3f, 0, new Color(98.4f, 85.5f, 0f));
+            int dustid = Terraria.Dust.NewDust(npc.position, npc.width, npc.height, ModContent.DustType<Agent1InkDroplet>(), 0f, -3f, 0, default);
             Main.dust[dustid].noGravity = true;
             Main.dust[dustid].fadeIn = 5f;
         }

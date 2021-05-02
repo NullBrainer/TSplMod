@@ -21,7 +21,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
         {
             projectile.arrow = true;
             projectile.width = 60;
-            projectile.height = 60;
+            projectile.height = 85;
             projectile.aiStyle = 0;
             projectile.minion = true;
             projectile.friendly = true;

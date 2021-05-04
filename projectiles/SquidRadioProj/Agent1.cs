@@ -10,7 +10,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
 {
     public class Agent1 : InklingSummon
     {
-
+        private int projectiles = 10;
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {            
             target.AddBuff(ModContent.BuffType<Agent1Debuff>(), 300, false);
@@ -58,7 +58,6 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
                 if (foundTarget)
                 {
-                    //not prim -> prime -> roller 
                     if ((Vector2.Distance(projectile.Center, target) <= 32f && (projectile.velocity.X < 0.05f || projectile.velocity.X > -0.05f)) || (InklingState != InklingStates.ROLLER_DOWN && Vector2.Distance(projectile.Center, target) > 32f))
                     {
                         SetInklingState(InklingStates.PRIMARY);
@@ -137,8 +136,56 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             return InklingState == InklingStates.ROLLER_DOWN && (projectile.velocity.X > 7f || projectile.velocity.X < -7f);
         }
 
+        protected override void TimedAttack(Vector2 targetposition, float Cooldown, int subthrowframe, int specialthrowframe)
+        {
+            projectile.ai[0] += 1f;
+            if (targetposition.X - projectile.Center.X < 0)
+            {
+                projectile.direction = -1;
+            }
+            else
+            {
+                projectile.direction = 1;
+            }
+            projectile.spriteDirection = projectile.direction;
+
+            if (projectile.ai[0] >= Cooldown)
+            {
+                projectile.ai[0] = 0f;
+                projectile.netUpdate = true;
+                Vector2 projVector = RandomSpread(16f, 16f, 15f);
+                targetposition.Y -= PositionOffset(targetposition);
+                projVector *= projectile.DirectionTo(targetposition);
+                CenteroffSet = projectile.Center;
+                CenteroffSet.Y -= projectile.height * 0.10f;
+                if (projectile.direction < 0)
+                {
+                    CenteroffSet.X += 5f;
+                }
+                else
+                {
+                    CenteroffSet.X -= 5f;
+                }
+
+                switch (InklingState)
+                {
+                    case InklingStates.PRIMARY:
+                        DefaultAttack(projVector, targetposition);
+                        break;
+                    case InklingStates.SUB:
+                        SubAttack(projVector, targetposition, subthrowframe);
+                        break;
+                    case InklingStates.SPECIAL:
+                        SpecialAttack(projVector, targetposition, specialthrowframe);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
         protected override void DefaultAttack(Vector2 projVector, Vector2 targetposition)
         {
+
             if (projectile.direction < 0)
             {
                 CenteroffSet.X -= 30f;
@@ -157,10 +204,32 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
                 Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/RollerSwing"), 0.5f);
                 Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/PlayerWeaponRollerSpray" + Main.rand.Next(0, 3)), 0.5f);
-                Projectile.NewProjectile(CenteroffSet, Vector2.Zero, ModContent.ProjectileType<HeroRollerSwingProjectile>(), 150, 10f, projectile.owner);
+                Projectile.NewProjectile(CenteroffSet, Vector2.Zero, ModContent.ProjectileType<HeroRollerSwingProjectile>(), 140, 10f, projectile.owner);
+               
+                Vector2[] positions = RandomSpreads(16f, 75f,projectiles);
+                for (int i = 0; i < projectiles; i++)
+                {
+                    positions[i] *= projectile.DirectionTo(target);
+                    //projVector = projectile.DirectionTo(target)* RandomSpread(12f, 12f, 90f);
+                    CenteroffSet.Y -= Main.rand.NextFloat(1.5f,5f);
+                    Projectile.NewProjectile(CenteroffSet,positions[i], ModContent.ProjectileType<HeroRollerSplash>(), 125, 3f, projectile.owner);
+                }
             }
         }
-
+        private Vector2[] RandomSpreads(float speed, float angle, int num)
+        {
+            var posArray = new Vector2[num];
+            float spread = (float)(angle * 0.0174532925);
+            speed = (float)Math.Sqrt((speed*speed)+(speed*speed));
+            double baseAngle = System.Math.Atan2(speed, speed);
+            double randomAngle;
+            for (int i = 0; i < num; ++i)
+            {
+                randomAngle = baseAngle + (Main.rand.NextFloat() - 0.5f) * spread;
+                posArray[i] = new Vector2(speed * (float)Math.Cos(randomAngle), speed * (float)Math.Sin(randomAngle));
+            }
+            return (Vector2[])posArray;
+        }
         protected override void SubAttack(Vector2 projVector, Vector2 targetposition, int throwingframe)
         {
             if (projectile.frame == throwingframe)

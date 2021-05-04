@@ -50,10 +50,10 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
         {
             player.AddBuff(item.buffType, 2);
             position = Main.MouseWorld;
-            int agentID = 1;//Order of summoning, 3 1, 2
+            int agentID = 1;
             if (agentID == 1)
             {
-                damage = 125;
+                damage = 140;
             }
            
             Projectile.NewProjectile(position, Vector2.Zero, Projectiles[agentID], damage, knockBack, player.whoAmI);

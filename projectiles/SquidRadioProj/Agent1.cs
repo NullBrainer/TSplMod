@@ -10,7 +10,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
 {
     public class Agent1 : InklingSummon
     {
-        private int projectiles = 10;
+        private  readonly int projectiles = 10;
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {            
             target.AddBuff(ModContent.BuffType<Agent1Debuff>(), 300, false);
@@ -49,7 +49,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             projectile.position = SlopedCollision.XY();
             projectile.velocity = SlopedCollision.ZW();
 
-            CheckConditions(player, distanceToIdlePosition, vectorToIdlePosition);
+            CheckConditions(distanceToIdlePosition, vectorToIdlePosition);
             if (distanceToIdlePosition > MaxDistance)
             {
                 SetInklingState(InklingStates.FLYING);
@@ -58,9 +58,13 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
                 if (foundTarget)
                 {
-                    if ((Vector2.Distance(projectile.Center, target) <= 32f && (projectile.velocity.X < 0.05f || projectile.velocity.X > -0.05f)) || (InklingState != InklingStates.ROLLER_DOWN && Vector2.Distance(projectile.Center, target) > 32f))
+                    if (SubActive)
                     {
-                        SetInklingState(InklingStates.PRIMARY);
+                        SetInklingState(InklingStates.SUB);
+                    }
+                    else if ((Vector2.Distance(projectile.Center, target) <= 32f && (projectile.velocity.X < 0.05f || projectile.velocity.X > -0.05f)) || (InklingState != InklingStates.ROLLER_DOWN && Vector2.Distance(projectile.Center, target) > 32f))
+                    {
+                            SetInklingState(InklingStates.PRIMARY);
                     }
                     CombatContext();
                 }
@@ -81,7 +85,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
 
 
         }
-        protected void CheckConditions(Player player, float distanceToIdlePosition, Vector2 vectorToIdlePosition)
+        protected void CheckConditions(float distanceToIdlePosition, Vector2 vectorToIdlePosition)
         {
             switch (InklingState)
             {
@@ -119,6 +123,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     }
                     break;
                 case InklingStates.SUB:
+                    TimedAttack(target, 6f, 20, 23);
                     break;
                 case InklingStates.SPECIAL:
                     break;
@@ -235,7 +240,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             if (projectile.frame == throwingframe)
             {
                 Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BombFly"), 0.5f);
-                Projectile.NewProjectile(CenteroffSet, projVector, ModContent.ProjectileType<HeroBurstBomb>(), (projectile.damage), projectile.knockBack, projectile.owner);
+                Projectile.NewProjectile(CenteroffSet, projVector, ModContent.ProjectileType<SuctionBomb>(), (projectile.damage), projectile.knockBack, projectile.owner);
                 SubActive = false;
                 specialCounter += 10;
             }

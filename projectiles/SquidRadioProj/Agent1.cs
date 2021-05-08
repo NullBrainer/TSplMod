@@ -76,7 +76,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 {
                     SetInklingState(InklingStates.FOLLOW);
                 }
-                else if ((projectile.velocity.X < 1f || projectile.velocity.X > -1f))// && distanceToIdlePosition < FollowRange)//(Math.Abs(projectile.position.X - player.position.X) <= FollowRange)
+                else if ((projectile.velocity.X < 1f || projectile.velocity.X > -1f) && (player.velocity.X < 1f || player.velocity.X > -1f))// && distanceToIdlePosition < FollowRange)//(Math.Abs(projectile.position.X - player.position.X) <= FollowRange)
                 {
                     SetInklingState(InklingStates.IDLE);
                 }
@@ -290,6 +290,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     PlayerAnimation(17, 18);
                     break;
                 case InklingStates.SUB:
+                    FrameSpeed = 9;
                     PlayerAnimation(19, 21);
                     break;
                 case InklingStates.SPECIAL:

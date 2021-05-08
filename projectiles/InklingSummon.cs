@@ -304,10 +304,6 @@ namespace SplatoonMod.projectiles
         {
             if (distanceToIdlePosition < dist)
             {
-                speed -= 0.01f;
-            }
-            else if(distanceToIdlePosition == dist)
-            {
                 speed = Math.Abs(Main.player[projectile.owner].velocity.X);
             }
             else

@@ -21,7 +21,6 @@ namespace SplatoonMod.projectiles.HeroProjectiles
 
         public override void SetDefaults()
         {
-            projectile.arrow = true;
             projectile.width = 10;
             projectile.height = 10;
             projectile.aiStyle = 0;
@@ -30,7 +29,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             projectile.penetrate = 1;
             projectile.ignoreWater = false;
             projectile.velocity = Vector2.Zero;
-            projectile.rotation = 1f;
+            projectile.rotation = Main.rand.NextFloat(0,2f);
         }
 
 
@@ -74,7 +73,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
         }
         private void Explode(Vector2 oldpos)
         {
-            for (int i = 0; i < 25; i++)
+            for (int i = 0; i < 15; i++)
             {
                 int dustIndex = Terraria.Dust.NewDust(oldpos, (projectile.width / 2), (projectile.height / 2), ModContent.DustType<Agent1InkDroplet>(), 0f, 0f, 100,default, 2f);
                 Main.dust[dustIndex].velocity.X = Main.rand.NextFloat(-1, 1);

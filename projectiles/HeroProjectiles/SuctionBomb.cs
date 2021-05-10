@@ -69,7 +69,8 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             }
             stuck = true;
             projectile.velocity = Vector2.Zero;
-            
+            //SuctionBombContact
+            Main.PlaySound(SoundLoader.customSoundType, projectile.oldPosition, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/SuctionBombContact"));
             return false;
         }
 
@@ -85,8 +86,12 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             }
             else
             {
-                
                 projectile.ai[0] += 1;
+                if (projectile.ai[0] == 60f)
+                {
+                    projectile.light = 0.75f;
+                    Main.PlaySound(SoundLoader.customSoundType, projectile.oldPosition, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BombAlert01"));
+                }
                 if (projectile.ai[0] > 120f)
                 {
                     projectile.ai[0] = 0;
@@ -124,16 +129,17 @@ namespace SplatoonMod.projectiles.HeroProjectiles
         }
         private void Explode(Vector2 oldpos)
         {
+            projectile.light = 1.5f;
             Vector2 vel = new Vector2(0f, 0f);
-            Projectile.NewProjectile(oldpos, vel, ModContent.ProjectileType<InkExplosion>(), projectile.damage, projectile.knockBack, projectile.owner, 0, 3);
-            Main.PlaySound(SoundLoader.customSoundType, oldpos, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BurstBombExplosion"));
+            Projectile.NewProjectile(oldpos, vel, ModContent.ProjectileType<SuctionBombExplosion>(), projectile.damage, projectile.knockBack, projectile.owner, 0, 3);
+            Main.PlaySound(SoundLoader.customSoundType, oldpos, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BombExplosion00"));
             for (int i = 0; i < 50; i++)
             {
-                int dustIndex = Terraria.Dust.NewDust(oldpos, (projectile.width / 2), (projectile.height / 2), ModContent.DustType<Agent1InkDroplet>(), 0f, 0f, 100, default, 2f);
+                int dustIndex = Terraria.Dust.NewDust(oldpos, (projectile.width / 2), (projectile.height / 2), ModContent.DustType<Agent1InkDroplet>(), 0f, 0f, 0, default, 2f);
                 Main.dust[dustIndex].velocity.X = Main.rand.NextFloat(-1, 1);
                 Main.dust[dustIndex].velocity.Y = Main.rand.NextFloat(-1, 1);
-                Main.dust[dustIndex].velocity *= 5f;
-                Main.dust[dustIndex].fadeIn = 15f;
+                Main.dust[dustIndex].velocity *= 8f;
+                Main.dust[dustIndex].fadeIn = 8f;
                 Main.dust[dustIndex].scale = 2f;
             }
         }

@@ -12,7 +12,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("Ink");
+            DisplayName.SetDefault("HeroShot_Ink");
         }
 
         public override void SetDefaults()
@@ -21,7 +21,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             projectile.width = 10;
             projectile.height = 10;
             projectile.aiStyle = 1;
-            projectile.ranged = true;
+            projectile.minion = true;
             projectile.friendly = true;
             projectile.penetrate = 1;
             projectile.ignoreWater = false;

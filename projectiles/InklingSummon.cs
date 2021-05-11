@@ -8,6 +8,7 @@ using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
 using Microsoft.Xna.Framework.Graphics;
+using SplatoonMod.Util;
 
 namespace SplatoonMod.projectiles
 {

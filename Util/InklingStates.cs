@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SplatoonMod.projectiles
+namespace SplatoonMod.Util
 {
     public enum InklingStates
     {
@@ -17,7 +17,8 @@ namespace SplatoonMod.projectiles
         FLYING,
         SUB,
         SPECIAL,
-        ROLLER_DOWN
+        ROLLER_DOWN,
+        WAIT
 
 
 

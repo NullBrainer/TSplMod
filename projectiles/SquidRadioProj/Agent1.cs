@@ -2,6 +2,7 @@
 using SplatoonMod.Buffs;
 using SplatoonMod.projectiles.HeroProjectiles;
 using System;
+using SplatoonMod.Util;
 using Terraria;
 using Terraria.ID;
 using Terraria.ModLoader;
@@ -50,6 +51,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             projectile.velocity = SlopedCollision.ZW();
 
             CheckConditions(distanceToIdlePosition, vectorToIdlePosition);
+            // if not in cooldown, continue.
             if (distanceToIdlePosition > MaxDistance)
             {
                 SetInklingState(InklingStates.FLYING);
@@ -115,7 +117,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
 
                 case InklingStates.PRIMARY:
-                    projectile.velocity.X = projectile.direction * 0.01f;
+                    projectile.velocity.X = projectile.direction * 0.001f;
                     TimedAttack(target, 20f, 20, 23);
                     if (projectile.frame == 3)
                     {
@@ -123,9 +125,11 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     }
                     break;
                 case InklingStates.SUB:
-                    TimedAttack(target, 6f, 20, 23);
+                    projectile.velocity.X = projectile.direction * 0.001f;
+                    TimedAttack(target, 15f, 20, 23);
                     break;
                 case InklingStates.SPECIAL:
+                    projectile.velocity.X = projectile.direction * 0.001f;
                     break;
                 case InklingStates.ROLLER_DOWN:
                     speed = 10f;
@@ -257,6 +261,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
 
         protected override void Animate(InklingStates state)
         {
+            
             switch (state)
             {
                 case InklingStates.IDLE:
@@ -290,8 +295,9 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     PlayerAnimation(17, 18);
                     break;
                 case InklingStates.SUB:
-                    FrameSpeed = 9;
-                    PlayerAnimation(19, 21);
+                    FrameSpeed = 15;
+                    AnimateState(19, 21, InklingStates.IDLE);
+//                    PlayerAnimation(19, 21);
                     break;
                 case InklingStates.SPECIAL:
                     PlayerAnimation(22, 24);

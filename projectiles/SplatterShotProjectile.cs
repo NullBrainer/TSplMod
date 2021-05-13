@@ -35,6 +35,11 @@ namespace SplatoonMod.projectiles
 
         public override void AI()
         {
+            projectile.knockBack -= 0.1f;
+            if (projectile.knockBack <= 0.5f)
+            {
+            projectile.knockBack = 0.5f;
+            }
             projectile.velocity.Y += 0.3f;
             if (projectile.velocity.Y > 16f)
             {

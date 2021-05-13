@@ -9,11 +9,16 @@ using Terraria.ModLoader;
 
 namespace SplatoonMod.projectiles.SquidRadioProj
 {
+    /*
+     TODO: Added reference to owner in Summon attack to update timer and play animation
+     */
     public class Agent1 : InklingSummon
     {
-        private  readonly int projectiles = 10;
+
+        private readonly int projectiles = 10;
+
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
-        {            
+        {
             target.AddBuff(ModContent.BuffType<Agent1Debuff>(), 300, false);
         }
         public override void AI()
@@ -30,6 +35,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
             ProjectileID.Sets.Homing[projectile.type] = true;
             CenteroffSet = projectile.Center;
+            
         }
 
         public override void SetDefaults()
@@ -42,6 +48,8 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             drawOffsetX = -20;
             maxspeed = 10f;
             defaultInertia = 20f;
+            CooldownLimit = 24f;
+            AttackTypes = new SummonAttack[] { new SummonAttack(this, 1, 3, 20f), new SummonAttack(this, 19, 21, 15f), new SummonAttack(this, 22, 24, 15f) };
         }
         protected override void SetStates(Player player, float distanceToIdlePosition, Vector2 vectorToIdlePosition)
         {
@@ -49,9 +57,11 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             Vector4 SlopedCollision = Collision.SlopeCollision(projectile.position, projectile.velocity, projectile.width, projectile.height, 1f, false);
             projectile.position = SlopedCollision.XY();
             projectile.velocity = SlopedCollision.ZW();
-
-            CheckConditions(distanceToIdlePosition, vectorToIdlePosition);
-            // if not in cooldown, continue.
+            MovementContext(distanceToIdlePosition, vectorToIdlePosition);
+            CheckCondition(player, distanceToIdlePosition, vectorToIdlePosition);
+        }
+        protected void CheckCondition(Player player, float distanceToIdlePosition, Vector2 vectorToIdlePosition)
+        {
             if (distanceToIdlePosition > MaxDistance)
             {
                 SetInklingState(InklingStates.FLYING);
@@ -60,13 +70,15 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
                 if (foundTarget)
                 {
+
                     if (SubActive)
                     {
                         SetInklingState(InklingStates.SUB);
                     }
                     else if ((Vector2.Distance(projectile.Center, target) <= 32f && (projectile.velocity.X < 0.05f || projectile.velocity.X > -0.05f)) || (InklingState != InklingStates.ROLLER_DOWN && Vector2.Distance(projectile.Center, target) > 32f))
                     {
-                            SetInklingState(InklingStates.PRIMARY);
+
+                        SetInklingState(InklingStates.PRIMARY);
                     }
                     CombatContext();
                 }
@@ -82,12 +94,9 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 {
                     SetInklingState(InklingStates.IDLE);
                 }
-
             }
-
-
         }
-        protected void CheckConditions(float distanceToIdlePosition, Vector2 vectorToIdlePosition)
+        /*protected override void MovementContext(float distanceToIdlePosition, Vector2 vectorToIdlePosition)
         {
             switch (InklingState)
             {
@@ -109,16 +118,16 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 default:
                     break;
             }
+        }*/
 
-        }
-        protected void CombatContext()
+        protected override void CombatContext()
         {
+                Vector2 projectileVector = Vector2.One;
             switch (InklingState)
             {
-
                 case InklingStates.PRIMARY:
                     projectile.velocity.X = projectile.direction * 0.001f;
-                    TimedAttack(target, 20f, 20, 23);
+                    TimedAttack(target, projectileVector, 20f, 20, 23);
                     if (projectile.frame == 3)
                     {
                         SetInklingState(InklingStates.ROLLER_DOWN);
@@ -126,7 +135,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     break;
                 case InklingStates.SUB:
                     projectile.velocity.X = projectile.direction * 0.001f;
-                    TimedAttack(target, 15f, 20, 23);
+                    TimedAttack(target, projectileVector, 15f, 20, 23);
                     break;
                 case InklingStates.SPECIAL:
                     projectile.velocity.X = projectile.direction * 0.001f;
@@ -145,7 +154,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             return InklingState == InklingStates.ROLLER_DOWN && (projectile.velocity.X > 7f || projectile.velocity.X < -7f);
         }
 
-        protected override void TimedAttack(Vector2 targetposition, float Cooldown, int subthrowframe, int specialthrowframe)
+        protected override void TimedAttack(Vector2 targetposition, Vector2 projVector, float Cooldown, int subthrowframe, int specialthrowframe)
         {
             projectile.ai[0] += 1f;
             if (targetposition.X - projectile.Center.X < 0)
@@ -162,7 +171,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
                 projectile.ai[0] = 0f;
                 projectile.netUpdate = true;
-                Vector2 projVector = RandomSpread(16f, 16f, 15f);
+                projVector = RandomSpread(16f, 16f, 15f);
                 targetposition.Y -= PositionOffset(targetposition);
                 projVector *= projectile.DirectionTo(targetposition);
                 CenteroffSet = projectile.Center;
@@ -187,6 +196,8 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     case InklingStates.SPECIAL:
                         SpecialAttack(projVector, targetposition, specialthrowframe);
                         break;
+                    case InklingStates.WAIT:
+                        break;
                     default:
                         break;
                 }
@@ -208,20 +219,21 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
                 Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/RollerLift"), 0.5f);
 
-            }else
+            }
+            else
             if (projectile.frame == 2)
             {
                 Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/RollerSwing"), 0.5f);
                 Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Roller/PlayerWeaponRollerSpray" + Main.rand.Next(0, 3)), 0.5f);
                 Projectile.NewProjectile(CenteroffSet, Vector2.Zero, ModContent.ProjectileType<HeroRollerSwingProjectile>(), 140, 10f, projectile.owner);
-               
-                Vector2[] positions = RandomSpreads(16f, 75f,projectiles);
+
+                Vector2[] positions = RandomSpreads(16f, 75f, projectiles);
                 for (int i = 0; i < projectiles; i++)
                 {
                     positions[i] *= projectile.DirectionTo(target);
-                    //projVector = projectile.DirectionTo(target)* RandomSpread(12f, 12f, 90f);
-                    CenteroffSet.Y -= Main.rand.NextFloat(1.5f,5f);
-                    Projectile.NewProjectile(CenteroffSet,positions[i], ModContent.ProjectileType<HeroRollerSplash>(), 125, 3f, projectile.owner);
+                    projVector = projectile.DirectionTo(target)* RandomSpread(12f, 12f, 90f);
+                    CenteroffSet.Y -= Main.rand.NextFloat(1.5f, 5f);
+                    Projectile.NewProjectile(CenteroffSet, positions[i], ModContent.ProjectileType<HeroRollerSplash>(), 125, 3f, projectile.owner);
                 }
             }
         }
@@ -229,7 +241,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
         {
             var posArray = new Vector2[num];
             float spread = (float)(angle * 0.0174532925);
-            speed = (float)Math.Sqrt((speed*speed)+(speed*speed));
+            speed = (float)Math.Sqrt((speed * speed) + (speed * speed));
             double baseAngle = System.Math.Atan2(speed, speed);
             double randomAngle;
             for (int i = 0; i < num; ++i)
@@ -245,8 +257,11 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
                 Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BombFly"), 0.5f);
                 Projectile.NewProjectile(CenteroffSet, projVector, ModContent.ProjectileType<SuctionBomb>(), (projectile.damage), projectile.knockBack, projectile.owner);
-                SubActive = false;
                 specialCounter += 10;
+            }
+            if (projectile.frame == AttackTypes[1].GetEndFrame()) 
+            {
+                SubActive = false;
             }
         }
 
@@ -261,7 +276,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
 
         protected override void Animate(InklingStates state)
         {
-            
+
             switch (state)
             {
                 case InklingStates.IDLE:
@@ -283,58 +298,38 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     }
                     break;
                 case InklingStates.PRIMARY:
-                    FrameSpeed = 20;
-                    AnimateState(1, 3, InklingStates.ROLLER_DOWN);
+                    FrameSpeed = (int)AttackTypes[0].GetDuration();
+                    AnimateState(AttackTypes[0].GetStartFrame(), AttackTypes[0].GetEndFrame(), InklingStates.WAIT);
                     break;
                 case InklingStates.JUMPING:
                     projectile.frame = 16;
                     break;
                 case InklingStates.LAND:
+
                     break;
                 case InklingStates.FLYING:
                     PlayerAnimation(17, 18);
                     break;
                 case InklingStates.SUB:
-                    FrameSpeed = 15;
-                    AnimateState(19, 21, InklingStates.IDLE);
-//                    PlayerAnimation(19, 21);
+                    FrameSpeed = (int)AttackTypes[1].GetDuration();
+                    PlayerAnimation(AttackTypes[1].GetStartFrame(), AttackTypes[1].GetEndFrame());
                     break;
                 case InklingStates.SPECIAL:
-                    PlayerAnimation(22, 24);
+                    PlayerAnimation(AttackTypes[2].GetStartFrame(), AttackTypes[1].GetEndFrame());
                     break;
                 case InklingStates.ROLLER_DOWN:
-                    FrameSpeedOnVelocity();                    
+                    FrameSpeedOnVelocity();
                     PlayerAnimation(10, 15);
-                    projectile.spriteDirection = projectile.direction;
+                    if (projectile.velocity.X > 0.5f || projectile.velocity.X < -0.5f)
+                    {
+                        projectile.spriteDirection = projectile.direction;
+                    }
                     break;
                 default:
                     break;
             }
         }
-        private void AnimateState(int startframe, int endframe, InklingStates newstate)
-        {
-            if (projectile.frame <= startframe || projectile.frame > endframe)
-            {
-                projectile.frame = startframe;
-            }
-            projectile.frameCounter++;
-            if (projectile.frameCounter >= FrameSpeed)
-            {
-                projectile.frameCounter = 0;
-                if (projectile.frame < endframe)
-                {                   
-                    projectile.frame++;
-                }
-                else if (projectile.frame == endframe)
-                {
-                    SetInklingState(newstate);
-                    projectile.frame = startframe;
-                }
-            }
-
-
-
-        }
+       
         private void FrameSpeedOnVelocity()
         {
             if (projectile.velocity.X < -8f || projectile.velocity.X > 8f)

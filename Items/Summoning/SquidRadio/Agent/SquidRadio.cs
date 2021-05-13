@@ -50,7 +50,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
         {
             player.AddBuff(item.buffType, 2);
             position = Main.MouseWorld;
-            int agentID = 1;
+            int agentID = 1;//Main.rand.Next(0,2);
             if (agentID == 1)
             {
                 damage = 140;

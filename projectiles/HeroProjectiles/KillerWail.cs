@@ -11,6 +11,8 @@ namespace SplatoonMod.projectiles.HeroProjectiles
 {
     public class KillerWail : ModProjectile
     {
+        private bool Shooting = false;
+        
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Killer_Wail");
@@ -19,28 +21,56 @@ namespace SplatoonMod.projectiles.HeroProjectiles
 
         public override void SetDefaults()
         {
-            projectile.arrow = true;
-            projectile.width = 10;
-            projectile.height = 10;
+            projectile.width = 50;
+            projectile.height = 50;
             projectile.aiStyle = 0;
             projectile.minion = true;
             projectile.friendly = true;
-            projectile.penetrate = 1;
+            projectile.penetrate = -1;
             projectile.ignoreWater = false;
-            projectile.velocity = Vector2.Zero;
+           
         }
 
         public override void AI()
         {
-            Animate(0, 1, 2);
+            projectile.velocity.Y = 0f;
+            if (projectile.velocity.X < 0)
+            {
+                projectile.velocity.X = -0.000001f;
+                projectile.direction = -1;
+            }
+            else
+            {
+                projectile.velocity.X = 0f;
+                projectile.direction = 1;
+            }
+            projectile.spriteDirection = projectile.direction;
             projectile.ai[0] += 1;
+            if (!Shooting && projectile.ai[0] > 120f)
+            {
+                ShootBeam();
+                Shooting = true;
+            }
+            if ( Shooting)
+            {
+                Animate(0, 1, 2);
+            }
             if (projectile.ai[0] > 240f)
             {
                 projectile.ai[0] = 0;
                 projectile.Kill();
             }
         }
-        private  void Animate(int startframe, int endframe, int FrameSpeed)
+        private void ShootBeam()
+        {
+            //Type 447
+            Vector2 vel = new Vector2(2f,0f);
+            vel.X *= projectile.spriteDirection;
+            Projectile.NewProjectile(projectile.position, vel, ModContent.ProjectileType<KillerWailProjectile>(), 50, 0f, projectile.owner,0f,(float)projectile.whoAmI);
+
+        }
+
+        private void Animate(int startframe, int endframe, int FrameSpeed)
         {
             if (projectile.frame < startframe || projectile.frame > endframe)
             {
@@ -59,6 +89,14 @@ namespace SplatoonMod.projectiles.HeroProjectiles
                     projectile.frame = startframe;
                 }
             }
+        }
+        public override bool CanDamage()
+        {
+            return false;
+        }
+        public override bool? CanCutTiles()
+        {
+            return false;
         }
     }
 }

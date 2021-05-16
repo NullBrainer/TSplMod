@@ -26,6 +26,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
 			TailDimension = new Point(100, 10);
 		
 		private int BeamFrame = 0;
+		private bool SoundOn = false;
 
 		
 		public override void SetDefaults()
@@ -36,19 +37,29 @@ namespace SplatoonMod.projectiles.HeroProjectiles
 			projectile.penetrate = -1;
 			projectile.tileCollide = false;
 			projectile.minion = true;			
-			projectile.timeLeft = 120;
+			projectile.timeLeft = 180;
 			OriginPoint = projectile.position.ToPoint();
 		}
         public override void AI()
 		{
+			
 			Origin = Main.projectile[(int)projectile.ai[1]].Center;
+            if (!SoundOn)
+            {
+				Main.PlaySound(SoundLoader.customSoundType, projectile.position, mod.GetSoundSlot(SoundType.Custom, "Sounds/Specials/BigLaser01"));
+				SoundOn = true;
+			}
 			HandleBeamSegmentAnimation();
+			
 		}
 
 		public override bool PreDraw(SpriteBatch spriteBatch, Color lightColor)
 		{
+
 				DrawLaser(spriteBatch, Main.projectileTexture[projectile.type], Origin,
 					projectile.velocity, 10, -1.57f, 1f, Color.White, (int)MOVE_DISTANCE);
+			DelegateMethods.v3_1 = new Vector3(0.686f, 0.086f, 0.675f);
+			Utils.PlotTileLine(Origin, Origin + projectile.velocity * (Distance - ((BodyDimensions.Y * 0.5f) + 10)), BodyDimensions.Y, DelegateMethods.CastLight);
 			return false;
 		}
 

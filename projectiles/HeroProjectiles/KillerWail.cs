@@ -12,7 +12,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
     public class KillerWail : ModProjectile
     {
         private bool Shooting = false;
-        
+        private bool SoundOn = false;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("Killer_Wail");
@@ -28,7 +28,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             projectile.friendly = true;
             projectile.penetrate = -1;
             projectile.ignoreWater = false;
-           
+
         }
 
         public override void AI()
@@ -45,13 +45,17 @@ namespace SplatoonMod.projectiles.HeroProjectiles
                 projectile.direction = 1;
             }
             projectile.spriteDirection = projectile.direction;
+            if (!SoundOn)
+            {
+                Sound();
+            }
             projectile.ai[0] += 1;
-            if (!Shooting && projectile.ai[0] > 120f)
+            if (!Shooting && projectile.ai[0] > 60f)
             {
                 ShootBeam();
                 Shooting = true;
             }
-            if ( Shooting)
+            if (Shooting)
             {
                 Animate(0, 1, 2);
             }
@@ -64,12 +68,17 @@ namespace SplatoonMod.projectiles.HeroProjectiles
         private void ShootBeam()
         {
             //Type 447
-            Vector2 vel = new Vector2(2f,0f);
+            Vector2 vel = new Vector2(2f, 0f);
             vel.X *= projectile.spriteDirection;
-            Projectile.NewProjectile(projectile.position, vel, ModContent.ProjectileType<KillerWailProjectile>(), 50, 0f, projectile.owner,0f,(float)projectile.whoAmI);
+            Projectile.NewProjectile(projectile.position, vel, ModContent.ProjectileType<KillerWailProjectile>(), 50, 0f, projectile.owner, 0f, (float)projectile.whoAmI);
 
         }
+        private void Sound()
+        {
+            SoundOn = true;
+            Main.PlaySound(SoundLoader.customSoundType, projectile.position, mod.GetSoundSlot(SoundType.Custom, "Sounds/Specials/BigLaser10"));
 
+        }
         private void Animate(int startframe, int endframe, int FrameSpeed)
         {
             if (projectile.frame < startframe || projectile.frame > endframe)

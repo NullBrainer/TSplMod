@@ -67,10 +67,9 @@ namespace SplatoonMod.projectiles.HeroProjectiles
         }
         private void ShootBeam()
         {
-            //Type 447
             Vector2 vel = new Vector2(2f, 0f);
             vel.X *= projectile.spriteDirection;
-            Projectile.NewProjectile(projectile.position, vel, ModContent.ProjectileType<KillerWailProjectile>(), 50, 0f, projectile.owner, 0f, (float)projectile.whoAmI);
+            Projectile.NewProjectile(projectile.position, vel, ModContent.ProjectileType<KillerWailProjectile>(), projectile.damage, 0f, projectile.owner, 0f, (float)projectile.whoAmI);
 
         }
         private void Sound()

@@ -16,11 +16,10 @@ namespace SplatoonMod.projectiles
         }
 
         public override void SetDefaults()
-        {
-            projectile.arrow = true;
+        {            
             projectile.width = 10;
             projectile.height = 10;
-            projectile.aiStyle = 1;
+            projectile.aiStyle = 0;
             projectile.minion = true;
             projectile.friendly = true;
             projectile.penetrate = 1;
@@ -45,6 +44,7 @@ namespace SplatoonMod.projectiles
             {
                 projectile.velocity.Y = 16f;
             }
+            projectile.rotation = (float)Math.Atan2((double)projectile.velocity.Y, (double)projectile.velocity.X) + 1.57f;
             base.AI();
         }
     }

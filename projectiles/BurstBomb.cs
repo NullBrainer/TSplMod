@@ -43,6 +43,7 @@ namespace SplatoonMod.projectiles
         }
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
+            target.AddBuff(ModContent.BuffType<Agent1Debuff>(), 300, false);
             if (projectile.Hitbox.Intersects(target.Hitbox))
             {
             PreKill(1);

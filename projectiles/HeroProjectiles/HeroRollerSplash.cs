@@ -29,7 +29,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             projectile.penetrate = 1;
             projectile.ignoreWater = false;
             projectile.velocity = Vector2.Zero;
-            projectile.rotation = Main.rand.NextFloat(0,2f);
+            projectile.rotation = Main.rand.NextFloat(0,2f) * Main.rand.NextFloatDirection();
         }
 
 

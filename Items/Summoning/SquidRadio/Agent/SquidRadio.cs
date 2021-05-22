@@ -24,7 +24,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
         }
         public override void SetDefaults()
         {
-            Projectiles = new int[]{ ModContent.ProjectileType<SquidRadioProj>() , ModContent.ProjectileType<Agent1>()};
+            Projectiles = new int[]{ ModContent.ProjectileType<SquidRadioProj>() , ModContent.ProjectileType<Agent1>(), ModContent.ProjectileType<Agent2>() };
             item.damage = 35;
             item.knockBack = 2.5f;
             item.mana = 10;
@@ -50,12 +50,15 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
         {
             player.AddBuff(item.buffType, 2);
             position = Main.MouseWorld;
-            int agentID = 1;
+            int agentID = 2;
             if (agentID == 1)
             {
                 damage = 140;
+            } else if (agentID == 2)
+            {
+                damage = 160;
             }
-           
+
             Projectile.NewProjectile(position, Vector2.Zero, Projectiles[agentID], damage, knockBack, player.whoAmI);
             return false;
         }

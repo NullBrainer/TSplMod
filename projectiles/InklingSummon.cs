@@ -20,7 +20,7 @@ namespace SplatoonMod.projectiles
         protected readonly float TerminalVelocity = 10f;
         protected int SquidBuffType;
         protected float TargetingAngle;
-        protected float speed, inertia, maxspeed, defaultInertia, defaultspeed;
+        protected float speed, inertia, maxspeed, defaultInertia, defaultspeed, projectilespeed, primaryprojectileespeed ,primaryAccuracy ,subAccuracy ,specialAccuracy;
         protected Vector2 target;
         protected NPC targetnpc;
         protected readonly float FollowRange = 48f;
@@ -29,8 +29,9 @@ namespace SplatoonMod.projectiles
         protected bool SubActive = false, specialused = false, foundTarget = false;
         protected int specialReq = 180;
         protected int specialCounter = 0;
-        protected float CooldownLimit, SubChanceTimer, SpecialDuration;
+        protected float CooldownLimit, SubChanceTimer,MaxSubTime, SpecialDuration;
         protected float Timer;
+        
         protected SummonAttack[] AttackTypes;
 
         protected void SetInklingState(InklingStates newstate)
@@ -70,8 +71,14 @@ namespace SplatoonMod.projectiles
             defaultspeed = 5f;
             SubChanceTimer = 0f;
             CooldownLimit = 0f;
+            MaxSubTime = 30f;
             Timer = 0f;
             SpecialDuration = 300f;
+            projectilespeed = 16f;
+            primaryprojectileespeed = 16f;
+            primaryAccuracy = 15f;
+            subAccuracy = 20f;
+            specialAccuracy = 20f;
             AttackTypes = new SummonAttack[] { new SummonAttack(this, 1, 5, 6f), new SummonAttack(this, 16, 18, 10f), new SummonAttack(this, 16, 18, 6f) };//i dont wana put it here :C
         }
 
@@ -132,7 +139,7 @@ namespace SplatoonMod.projectiles
 
             Timer += 1f;
             SubChanceTimer += 1f;
-            if (!SubActive && SubChanceTimer >= 30f)
+            if (!SubActive && SubChanceTimer >= MaxSubTime)
             {
                 SubChanceTimer = 0f;
                 SubActive = Main.rand.Next(1, 10) == 1;
@@ -296,14 +303,14 @@ namespace SplatoonMod.projectiles
                 case InklingStates.PRIMARY:
                     FaceTarget(target);
                     projectile.velocity.X = 0;
-                    projectileVector = AimProjectile(target, 16f, 16f, 15f);
+                    projectileVector = AimProjectile(target, primaryprojectileespeed, projectilespeed, primaryAccuracy);
                     TimedAttack(target, projectileVector, AttackTypes[2].GetDuration(), 17, 17);
-                    CooldownLimit = AttackTypes[2].GetDuration();
+                    CooldownLimit = AttackTypes[0].GetDuration();
                     break;
                 case InklingStates.SUB:
                     FaceTarget(target);
                     projectile.velocity.X = 0;
-                    projectileVector = AimProjectile(target, 16f, 16f, 20f);
+                    projectileVector = AimProjectile(target, projectilespeed, projectilespeed, subAccuracy);
                     TimedAttack(target, projectileVector, AttackTypes[1].GetDuration(), 17, 17);
                     CooldownLimit = AttackTypes[1].GetDuration();
                     break;
@@ -311,7 +318,7 @@ namespace SplatoonMod.projectiles
                     FaceTarget(target);
                     projectile.velocity.X = 0;
                     specialused = true;
-                    projectileVector = AimProjectile(target, 16f, 16f, 20f);
+                    projectileVector = AimProjectile(target, projectilespeed, projectilespeed, specialAccuracy);
                     TimedAttack(target, projectileVector, AttackTypes[0].GetDuration(), 17, 17);
                     CooldownLimit = AttackTypes[0].GetDuration();
                     break;
@@ -606,13 +613,13 @@ namespace SplatoonMod.projectiles
              * angle = 1/(1/sin(distance * 0.0043f)*projectile.velocity.x)
              * 
              */
-            //float dist = projectile.Distance(targetposition);
-            //float time = (dist / Xcomp)*0.6f;// *0.6f;//in ticks right?
-           // double angle = 1/(1/Math.Cos(targetposition.X / (time * Xcomp)));
             
 
-            Vector2 projVector = RandomSpread(Xcomp, ycomp, accuracy);   //        
-            targetposition.Y -= PositionOffset(targetposition,Xcomp);
+            Vector2 projVector = RandomSpread(Xcomp, ycomp, accuracy);
+            if (accuracy == 0f) {
+                projVector = new Vector2(Xcomp,ycomp);
+            }
+            targetposition.Y -= PositionOffset(targetposition,ycomp);
             targetposition += (targetnpc.velocity * targetnpc.velocity)*targetnpc.direction;
             projVector *= projectile.DirectionTo(targetposition);
             CenteroffSet = projectile.Center;

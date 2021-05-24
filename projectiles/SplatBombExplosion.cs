@@ -5,14 +5,13 @@ using System.Collections.Generic;
 using Terraria;
 using Terraria.ModLoader;
 
-
 namespace SplatoonMod.projectiles
 {
-    public class SuctionBombExplosion : ModProjectile
+    public class SplatBombExplosion : ModProjectile
     {
         public override void SetStaticDefaults()
         {
-            DisplayName.SetDefault("SuctionBombExplosion");
+            DisplayName.SetDefault("SplatBombExplosion");
             Main.projFrames[projectile.type] = 8;
         }
         public override void SetDefaults()
@@ -40,7 +39,7 @@ namespace SplatoonMod.projectiles
 
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
-            target.AddBuff(ModContent.BuffType<Agent1Debuff>(), 300, false);
+            target.AddBuff(ModContent.BuffType<Agent2Debuff>(), 300, false);
 
         }
 
@@ -50,14 +49,10 @@ namespace SplatoonMod.projectiles
             int Y = (int)(projectile.Center.Y - target.Center.Y);
 
             int dist = (int)Math.Sqrt((X * X) + (Y * Y));
-            if (dist > projectile.Hitbox.Width / 3)
+            if (dist > (projectile.Hitbox.Width / 4)*3)
             {
-                damage = (int)(damage * 0.59f);
-            }
-            else if (dist >= projectile.Hitbox.Width / 2)
-            {
-                damage = (int)(damage * 0.72f);
-            }
+                damage = 30;
+            }           
         }
 
         protected virtual void UpdateFrames(int startframe, int endframe, int framespeed)

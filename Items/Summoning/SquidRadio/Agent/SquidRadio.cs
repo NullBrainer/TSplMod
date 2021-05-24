@@ -16,6 +16,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
 {
     public class SquidRadio : ModItem
     {
+        private int SummonCounter;
         private int[] Projectiles;
         public override void SetStaticDefaults()
         {
@@ -42,7 +43,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
             item.summon = true;
             item.buffType = ModContent.BuffType<SquidRadioBuff>();
             item.shoot = ModContent.ProjectileType<SquidRadioProj>();
-            
+            SummonCounter = 0;
             base.SetDefaults();
         }
 
@@ -50,7 +51,7 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
         {
             player.AddBuff(item.buffType, 2);
             position = Main.MouseWorld;
-            int agentID = 2;
+            int agentID = SummonCounter;
             if (agentID == 1)
             {
                 damage = 140;
@@ -60,6 +61,15 @@ namespace SplatoonMod.Items.Summoning.SquidRadio.Agent
             }
 
             Projectile.NewProjectile(position, Vector2.Zero, Projectiles[agentID], damage, knockBack, player.whoAmI);
+
+            if (SummonCounter == 2)
+            {
+                SummonCounter = 0;
+            }
+            else
+            {
+            SummonCounter++;
+            }
             return false;
         }
 

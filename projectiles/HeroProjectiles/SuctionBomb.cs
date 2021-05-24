@@ -32,10 +32,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             projectile.rotation = 0f;
         }
 
-        private bool WithinValues(float val, float min, float max)
-        {
-            return val > min && val < max;
-        }
+       
         public override bool OnTileCollide(Vector2 oldVelocity)
         {
             Vector2 collisionvector = Collision.TileCollision(projectile.position, projectile.velocity, projectile.height, default, default, default);

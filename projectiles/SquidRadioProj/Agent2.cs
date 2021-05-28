@@ -51,8 +51,10 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             primaryAccuracy = 0f;
             subAccuracy = 20f;
             specialAccuracy = 20f;
-            AttackTypes = new SummonAttack[] { new SummonAttack(this, 1, 5, 90f), new SummonAttack(this, 15, 17, 15f), new SummonAttack(this, 18, 20, 15f) };
-            SpecialDuration = AttackTypes[2].GetDuration();
+            distanceFromTarget = 320f;
+            TargetDetectRange = 120f;
+            AttackTypes = new SummonAttack[] { new SummonAttack(this, 1, 5, 90f), new SummonAttack(this, 15, 17, 15f), new SummonAttack(this, 18, 20, 10f) };
+           
         }
         protected override void PerformState(float distanceToIdlePosition, Vector2 vectorToIdlePosition)
         {
@@ -82,36 +84,35 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     
                     projectileVector = new Vector2(primaryprojectileespeed, primaryprojectileespeed);
                     Vector2 dest = target;
-                    /*dest.X += targetnpc.velocity.X;// * targetnpc.velocity.X * targetnpc.direction;
-                    dest.Y -= targetnpc.velocity.Y * targetnpc.directionY;// * targetnpc.directionY) * targetnpc.directionY;
+                    dest.X += (targetnpc.velocity.X * targetnpc.velocity.X) * targetnpc.direction;
+                    dest.Y -= (targetnpc.velocity.Y * targetnpc.velocity.Y) * targetnpc.directionY;
 
                     float dist = projectile.Distance(dest);
-                    float time = ((dist / primaryprojectileespeed)/60f)/60f;                    
-                    dest.Y -= primaryprojectileespeed * (float)Math.Sin(TargetingAngle) * time + (0.9f / 2f) * (time * time); ;
-                    dest.X += (primaryprojectileespeed*projectile.direction) * (float)Math.Cos(TargetingAngle) * time;*/
-
-                    //projectileVector *= projectile.DirectionTo(dest);
-                    projectileVector = AimProjectile(target, primaryprojectileespeed, primaryprojectileespeed, primaryAccuracy);
+                    float time = (dist / primaryprojectileespeed);
+                    TargetingAngle = RadToDegree(projectile.DirectionTo(target).ToRotation());
+                    dest.Y -=  (3f*time)*0.5f;
+                    //dest.X += (time*projectile.direction);
+                   
+                    projectileVector *= projectile.DirectionTo(dest);
+                    //projectileVector = AimProjectile(target, primaryprojectileespeed, primaryprojectileespeed, primaryAccuracy);
                     TimedAttack(target, projectileVector, AttackTypes[0].GetDuration(), 16, 19);
                     CooldownLimit = AttackTypes[0].GetDuration();
                     break;
                 case InklingStates.SUB:
                     FaceTarget(target);
-                    projectile.velocity.X = 0;
                     projectileVector = AimProjectile(target, projectilespeed, projectilespeed, subAccuracy);
                     TimedAttack(target, projectileVector, AttackTypes[1].GetDuration(), 16, 19);
                     CooldownLimit = AttackTypes[1].GetDuration();
                     break;
                 case InklingStates.SPECIAL:
                     FaceTarget(target);
-                    projectile.velocity.X = 0;
                     specialused = true;
                     projectileVector = AimProjectile(target, projectilespeed, projectilespeed, specialAccuracy);
                     TimedAttack(target, projectileVector, AttackTypes[2].GetDuration(), 16, 19);
                     CooldownLimit = AttackTypes[2].GetDuration();
                     break;
                 case InklingStates.WAIT:
-                    projectile.velocity.X *= 0f;
+                    projectile.velocity.X = 0f;
                     break;
                 default:
                     break;
@@ -150,6 +151,10 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 {
                     SetInklingState(InklingStates.JUMPING);
                 }
+                else
+                {
+                    SetInklingState(InklingStates.FOLLOW);
+                }/*
                 else if (Math.Abs(projectile.position.X - player.position.X) >= FollowRange)//distanceToIdlePosition > FollowRange)//distanceToIdlePosition > FollowRange || (player.velocity.X < -1f || player.velocity.X > 1f) && player.velocity.X != 0)
                 {
                     SetInklingState(InklingStates.FOLLOW);
@@ -159,7 +164,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 {
                     SetInklingState(InklingStates.IDLE);
 
-                }
+                }*/
 
             }
         }
@@ -171,7 +176,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             specialCounter+=5;
             Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Charger/Marie_ChargerShot"), 0.5f);
             Projectile.NewProjectile(CenteroffSet, projVector, ModContent.ProjectileType<ChargerProjectile>(), projectile.damage, projectile.knockBack, projectile.owner);                
-            TargetingAngle = DegreeToRad(projectile.DirectionTo(targetposition).ToRotation());
+            
         }
 
         protected override void SubAttack(Vector2 projVector, Vector2 targetposition, int throwingframe)
@@ -206,10 +211,15 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     FacePlayer();
                     break;
                 case InklingStates.FOLLOW:
-                    if (projectile.velocity.X > 0.5f || projectile.velocity.X < -0.5f)
+                    if (projectile.velocity.X > 1f || projectile.velocity.X < -1f)
                     {
                         projectile.spriteDirection = projectile.direction;
                         PlayerAnimation(6, 11);
+                    }
+                    else
+                    {
+                        projectile.frame = 0;
+                        FacePlayer();
                     }
                     break;
                 case InklingStates.RUN:
@@ -228,14 +238,15 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     SetAttackAnimation(TargetingAngle);
                     break;
                 case InklingStates.FLYING:
-                    projectile.tileCollide = false;
                     PlayerAnimation(13, 14);
                     break;
                 case InklingStates.SUB:
+                    projectile.velocity.X = 0f;
                     FrameSpeed = (int)AttackTypes[1].GetDuration();
                     PlayerAnimation(AttackTypes[1].GetStartFrame(), AttackTypes[1].GetEndFrame());
                     break;
                 case InklingStates.SPECIAL:
+                    projectile.velocity.X = 0f;
                     FrameSpeed = (int)AttackTypes[2].GetDuration();
                     PlayerAnimation(AttackTypes[2].GetStartFrame(), AttackTypes[2].GetEndFrame());
                     break;

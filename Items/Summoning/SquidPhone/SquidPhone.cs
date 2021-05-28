@@ -44,7 +44,6 @@ namespace SplatoonMod.Items.Summoning.SquidPhone
         {
             player.AddBuff(item.buffType, 2,true);
             position = Main.MouseWorld;
-            Projectile.NewProjectile(position, Vector2.Zero, ModContent.ProjectileType<SquidPhoneProj>(), damage, knockBack, player.whoAmI);
             return true;
 
         }

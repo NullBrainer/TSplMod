@@ -85,6 +85,11 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 {
                     SetInklingState(InklingStates.JUMPING);
                 }
+                else
+                {
+                    SetInklingState(InklingStates.FOLLOW);
+                }
+                /*
                 else if (Math.Abs(projectile.position.X - player.position.X) >= FollowRange)//distanceToIdlePosition > FollowRange)//distanceToIdlePosition > FollowRange || (player.velocity.X < -1f || player.velocity.X > 1f) && player.velocity.X != 0)
                 {
                     SetInklingState(InklingStates.FOLLOW);
@@ -92,7 +97,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 else if ((projectile.velocity.X < 1f || projectile.velocity.X > -1f) && (player.velocity.X < 1f || player.velocity.X > -1f))// && distanceToIdlePosition < FollowRange)//(Math.Abs(projectile.position.X - player.position.X) <= FollowRange)
                 {
                     SetInklingState(InklingStates.IDLE);
-                }
+                }*/
             }
         }
 
@@ -270,10 +275,15 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     }
                     break;
                 case InklingStates.FOLLOW:
-                    if (projectile.velocity.X != 0f)
+                    if (projectile.velocity.X > 1f || projectile.velocity.X < -1f)
                     {
                         projectile.spriteDirection = projectile.direction;
                         PlayerAnimation(4, 9);
+                    }
+                    else
+                    {
+                        projectile.frame = 0;
+                        FacePlayer();
                     }
                     break;
                 case InklingStates.PRIMARY:

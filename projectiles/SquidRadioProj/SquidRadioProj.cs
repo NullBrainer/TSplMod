@@ -20,7 +20,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             specialCounter++;
             Main.PlaySound(SoundLoader.customSoundType, (int)projectile.position.X, (int)projectile.position.Y, mod.GetSoundSlot(SoundType.Custom, "Sounds/Weapon/Shooter0" + Main.rand.Next(0, 2)), 0.5f);
             Projectile.NewProjectile(CenteroffSet, projVector, ModContent.ProjectileType<HeroShotProjectile>(), projectile.damage, projectile.knockBack, projectile.owner);
-            TargetingAngle = DegreeToRad(projectile.DirectionTo(targetposition).ToRotation());
+            TargetingAngle = RadToDegree(projectile.DirectionTo(targetposition).ToRotation());
         }
 
         protected override void SubAttack(Vector2 projVector, Vector2 targetposition, int throwingframe)

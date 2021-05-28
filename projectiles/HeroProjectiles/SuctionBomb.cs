@@ -66,7 +66,6 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             }
             stuck = true;
             projectile.velocity = Vector2.Zero;
-            //SuctionBombContact
             Main.PlaySound(SoundLoader.customSoundType, projectile.oldPosition, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/SuctionBombContact"));
             return false;
         }
@@ -83,10 +82,10 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             }
             else
             {
-                projectile.ai[0] += 1;
+                projectile.ai[0] += 1; 
+                projectile.light += 0.01f;
                 if (projectile.ai[0] == 60f)
                 {
-                    projectile.light = 0.75f;
                     Main.PlaySound(SoundLoader.customSoundType, projectile.oldPosition, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BombAlert01"));
                 }
                 if (projectile.ai[0] > 120f)

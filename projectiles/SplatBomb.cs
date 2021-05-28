@@ -31,8 +31,7 @@ namespace SplatoonMod.projectiles
             projectile.friendly = true;
             projectile.penetrate = -1;
             projectile.ignoreWater = false;
-            drawOffsetX = 1;
-            drawOriginOffsetY = -9;
+            drawOriginOffsetY = 4;
             projectile.rotation = 0f;
             FrameSpeed = 5;             
 
@@ -100,12 +99,14 @@ namespace SplatoonMod.projectiles
                 }
 
                 projectile.ai[0] += 1;
+                projectile.light += 0.01f;                
             }
 
             if (projectile.ai[0] == 1f)
             {
                 Main.PlaySound(SoundLoader.customSoundType, projectile.oldPosition, mod.GetSoundSlot(SoundType.Custom, "Sounds/Bombs/BombAlert01"));
             }
+            
             if (projectile.ai[0] == 60f)
             {
                 projectile.light = 0.15f;

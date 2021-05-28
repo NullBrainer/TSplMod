@@ -19,17 +19,17 @@ namespace SplatoonMod.projectiles
         protected readonly float Gravity = 0.6f, TerminalVelocity = 10f;
         protected int SquidBuffType;
         protected float TargetingAngle, TargetDetectRange, distanceFromTarget;
-        protected float speed, inertia, maxspeed, defaultInertia, defaultspeed, projectilespeed, primaryprojectileespeed ,primaryAccuracy ,subAccuracy ,specialAccuracy;
-        protected Vector2 target,FiringPosition;
+        protected float speed, inertia, maxspeed, defaultInertia, defaultspeed, projectilespeed, primaryprojectileespeed, primaryAccuracy, subAccuracy, specialAccuracy;
+        protected Vector2 target, FiringPosition;
         protected NPC targetnpc;
-        protected readonly float FollowRange = 64f,MaxDistance = 800f;
+        protected readonly float FollowRange = 64f, MaxDistance = 800f;
         protected int FrameSpeed = 7;
-        protected bool SubActive = false, specialused = false, foundTarget = false,FiringDestinationReached = false, FiringDestSet = false;
+        protected bool SubActive = false, specialused = false, foundTarget = false, FiringDestinationReached = false, FiringDestSet = false;
         protected int specialReq = 180;
         protected int specialCounter = 0;
-        protected float CooldownLimit, SubChanceTimer,MaxSubTime, SpecialDuration;
+        protected float CooldownLimit, SubChanceTimer, MaxSubTime, SpecialDuration;
         protected float Timer;
-        
+
         protected SummonAttack[] AttackTypes;
 
         protected void SetInklingState(InklingStates newstate)
@@ -52,15 +52,15 @@ namespace SplatoonMod.projectiles
         {
 
             projectile.netImportant = true;
-            projectile.width = 40;//66
-            projectile.height = 40; //70
+            projectile.width = 30;//66
+            projectile.height = 30; //70
             projectile.tileCollide = true;
             projectile.friendly = true;
             projectile.minion = true;
             projectile.minionSlots = 1f;
             projectile.penetrate = -1;
             SetInklingState(InklingStates.JUMPING);
-            drawOriginOffsetY = -16;
+            drawOriginOffsetY = -27;
             drawOffsetX = -20;
             speed = 3f;
             defaultInertia = 20f;
@@ -74,7 +74,7 @@ namespace SplatoonMod.projectiles
             SpecialDuration = 300f;
             projectilespeed = 16f;
             primaryprojectileespeed = 16f;
-            primaryAccuracy = 25f;
+            primaryAccuracy = 20f;
             subAccuracy = 25f;
             specialAccuracy = 25f;
             TargetDetectRange = 1000f;
@@ -130,10 +130,10 @@ namespace SplatoonMod.projectiles
             //PositionSelf(player);
             if (InklingState != InklingStates.RUN || InklingState != InklingStates.PRIMARY || InklingState != InklingStates.SUB || InklingState != InklingStates.SPECIAL)
             {
-            //FixOverlap(0.16f);
+                //FixOverlap(0.16f);
             }
 
-            
+
             target = projectile.position;
             foundTarget = false;
             target = FindTarget(player, distanceFromTarget, target);
@@ -170,8 +170,8 @@ namespace SplatoonMod.projectiles
                 SetStates(player, distanceToIdlePosition, vectorToIdlePosition);
                 PerformState(distanceToIdlePosition, vectorToIdlePosition);
             }
-                Animate(InklingState);
-                ResetConditions();
+            Animate(InklingState);
+            ResetConditions();
         }
         protected virtual void ResetConditions()
         {
@@ -206,7 +206,7 @@ namespace SplatoonMod.projectiles
                 projectile.tileCollide = false;
 
             }
-            
+
         }
 
         protected virtual void SetStates(Player player, float distanceToIdlePosition, Vector2 vectorToIdlePosition)
@@ -257,26 +257,10 @@ namespace SplatoonMod.projectiles
                 {
                     SetInklingState(InklingStates.JUMPING);
                 }
-                /*else if (distanceToIdlePosition == (projectile.width/2))// && distanceToIdlePosition < FollowRange)//(Math.Abs(projectile.position.X - player.position.X) <= FollowRange)
-                {
-                    SetInklingState(InklingStates.IDLE);//only animate idle, always follow.
-
-                }*/
                 else
                 {
                     SetInklingState(InklingStates.FOLLOW);
                 }
-                /*
-                else if (distanceToIdlePosition > FollowRange || (player.velocity.X < -1f || player.velocity.X > 1f) && player.velocity.X != 0)
-                {
-                    SetInklingState(InklingStates.FOLLOW);
-
-                }
-                else if ((projectile.velocity.X < 1f || projectile.velocity.X > -1f))// && distanceToIdlePosition < FollowRange)//(Math.Abs(projectile.position.X - player.position.X) <= FollowRange)
-                {
-                    SetInklingState(InklingStates.IDLE);
-
-                }*/
 
             }
         }
@@ -294,16 +278,16 @@ namespace SplatoonMod.projectiles
                     FiringPosition.X -= 160f;
                 }
                 FiringDestSet = true;
-            }           
+            }
         }
 
-       
+
 
         /// <summary>
         /// A helper method used for SetStates. Implemented to determine what attack to use
         /// when a target is spotted.
         /// </summary>
-       
+
 
         protected void UpdateSlopeMovement()
         {
@@ -321,12 +305,9 @@ namespace SplatoonMod.projectiles
         protected virtual void PerformState(float distanceToIdlePosition, Vector2 vectorToIdlePosition)
         {
             Vector2 projectileVector = Vector2.One;
-           
+
             switch (InklingState)
             {
-                case InklingStates.IDLE:
-                    projectile.velocity.X = 0f;
-                    break;
                 case InklingStates.RUN:
                     projectile.velocity.X = Approach(FiringPosition - projectile.position).X;
                     break;
@@ -338,7 +319,7 @@ namespace SplatoonMod.projectiles
                     break;
                 case InklingStates.FLYING:
                     UpdateInklingFlying(vectorToIdlePosition, distanceToIdlePosition);
-                    break;                
+                    break;
                 case InklingStates.PRIMARY:
                     FaceTarget(target);
                     projectileVector = AimProjectile(target, primaryprojectileespeed, primaryprojectileespeed, primaryAccuracy);
@@ -347,7 +328,7 @@ namespace SplatoonMod.projectiles
                     break;
                 case InklingStates.SUB:
                     FaceTarget(target);
-                    
+
                     projectileVector = AimProjectile(target, projectilespeed, projectilespeed, subAccuracy);
                     TimedAttack(target, projectileVector, AttackTypes[1].GetDuration(), 17, 17);
                     CooldownLimit = AttackTypes[1].GetDuration();
@@ -373,7 +354,7 @@ namespace SplatoonMod.projectiles
             projectile.velocity = Approach(vectorToIdlePosition);
         }
 
-        
+
 
         protected virtual int RandomPosNeg()
         {
@@ -393,25 +374,25 @@ namespace SplatoonMod.projectiles
         /// <param name="dist"></param>
         protected void FollowPlayer(float distanceToIdlePosition, Vector2 vectorToIdlePosition, float dist)
         {
-            if (distanceToIdlePosition > dist)
+            inertia = 5f;
+            if (distanceToIdlePosition < 5f)
             {
-                speed -= 1f;
-                inertia += 1;
+              speed = Math.Abs(Main.player[projectile.owner].velocity.X)*0.1f;               
+
             }
-            else if(distanceToIdlePosition < 5f)
+            else if (distanceToIdlePosition > dist)
             {
-               
-                speed = Math.Abs(Main.player[projectile.owner].velocity.X);               
-                inertia = 1;
+                speed += 1f;
             }
-                projectile.velocity.X = Approach(vectorToIdlePosition).X;
-           
+            projectile.velocity.X = Approach(vectorToIdlePosition).X;
+
+
             int denom = (int)Math.Abs(projectile.velocity.X) + 1;
-            FrameSpeed = 30/denom;
-            
+            FrameSpeed = 30 / denom;
+
         }
 
-       
+
 
         /// <summary>
         /// The immediate range around the target (when it passively floats about)
@@ -444,7 +425,7 @@ namespace SplatoonMod.projectiles
                 }
             }
         }
-              
+
 
         /// <summary>
         /// Vanilla targeting behavior that includes independent searching and player made targeting.
@@ -456,22 +437,22 @@ namespace SplatoonMod.projectiles
         protected virtual Vector2 FindTarget(Player player, float distfromtarget, Vector2 targetCenter)
         {
             // This code is required if your minion weapon has the targeting feature
-             if (player.HasMinionAttackTargetNPC && projectile.OwnerMinionAttackTargetNPC.CanBeChasedBy(projectile, false))//added projectile.OwnerMinionAttackTargetNPC.CanBeChasedBy(projectile,false)
-             {
-                 NPC target = Main.npc[player.MinionAttackTargetNPC];
-                 float between = Vector2.Distance(target.Center, projectile.Center);
-                 // Reasonable distance away so it doesn't target across multiple screens
-                 if (between < TargetDetectRange)//1000f
-                 {
-                     distfromtarget = between;
-                     targetCenter = target.Center;
-                     if (Collision.CanHit(projectile.position, projectile.width / 2, projectile.height / 2, target.position, target.width / 2, target.height / 2))
-                     {
-                         foundTarget = true;
-                     }
+            if (player.HasMinionAttackTargetNPC && projectile.OwnerMinionAttackTargetNPC.CanBeChasedBy(projectile, false))//added projectile.OwnerMinionAttackTargetNPC.CanBeChasedBy(projectile,false)
+            {
+                NPC target = Main.npc[player.MinionAttackTargetNPC];
+                float between = Vector2.Distance(target.Center, projectile.Center);
+                // Reasonable distance away so it doesn't target across multiple screens
+                if (between < TargetDetectRange)//1000f
+                {
+                    distfromtarget = between;
+                    targetCenter = target.Center;
+                    if (Collision.CanHit(projectile.position, projectile.width / 2, projectile.height / 2, target.position, target.width / 2, target.height / 2))
+                    {
+                        foundTarget = true;
+                    }
 
-                 }
-             }
+                }
+            }
             if (!foundTarget)
             {
                 for (int i = 0; i < Main.maxNPCs; i++)
@@ -489,7 +470,7 @@ namespace SplatoonMod.projectiles
                         {
                             distfromtarget = between;
                             targetCenter = minionTarget.Center;
-                            targetnpc = minionTarget;                            
+                            targetnpc = minionTarget;
                             foundTarget = true;
                         }
                     }
@@ -508,20 +489,20 @@ namespace SplatoonMod.projectiles
             AdjustProjectileSpawn();
             projectile.netUpdate = true;
 
-                switch (InklingState)
-                {
-                    case InklingStates.PRIMARY:
-                        DefaultAttack(projVector, targetposition);
-                        break;
-                    case InklingStates.SUB:
-                        SubAttack(projVector, targetposition, subthrowframe);
-                        break;
-                    case InklingStates.SPECIAL:
-                        SpecialAttack(projVector, targetposition, specialthrowframe);
-                        break;
-                    default:
-                        break;
-                }
+            switch (InklingState)
+            {
+                case InklingStates.PRIMARY:
+                    DefaultAttack(projVector, targetposition);
+                    break;
+                case InklingStates.SUB:
+                    SubAttack(projVector, targetposition, subthrowframe);
+                    break;
+                case InklingStates.SPECIAL:
+                    SpecialAttack(projVector, targetposition, specialthrowframe);
+                    break;
+                default:
+                    break;
+            }
         }
         protected void FaceTarget(Vector2 targetposition)
         {
@@ -536,7 +517,7 @@ namespace SplatoonMod.projectiles
             projectile.spriteDirection = projectile.direction;
 
         }
-        
+
         protected float RadToDegree(float Degree)
         {
             return (180f / (float)Math.PI) * Degree;
@@ -547,7 +528,7 @@ namespace SplatoonMod.projectiles
         /// </summary>
         /// <param name="targetposition"></param>
         /// <returns></returns>
-       
+
 
         /// <summary>
         /// Non inclusive comparison and inclusive comparison.
@@ -635,25 +616,19 @@ namespace SplatoonMod.projectiles
         protected virtual Vector2 AimProjectile(Vector2 targetposition, float Xcomp, float Ycomp, float accuracy)
         {
             Vector2 projVector = RandomSpread(Xcomp, Ycomp, accuracy);
-            if (accuracy == 0f) {
-                projVector = new Vector2(Xcomp,Ycomp);
+            if (accuracy == 0f)
+            {
+                projVector = new Vector2(Xcomp, Ycomp);
             }
             Vector2 dest = targetposition;
             dest.Y -= PositionOffset(targetposition) + targetnpc.velocity.Y;//(targetnpc.velocity.Y * targetnpc.velocity.Y) * targetnpc.directionY; 
             dest.X += targetnpc.velocity.X * targetnpc.velocity.X * targetnpc.direction;
             projVector *= projectile.DirectionTo(dest);
-            /*
-             * float time = (dist / vel) / 60f;
-             * (targetnpc.velocity.X * targetnpc.velocity.X);
-             * (targetnpc.velocity.Y * targetnpc.velocity.Y) * targetnpc.directionY;
-             * (vel * (float)Math.Sin(projectile.rotation) * time) - (583200f) * (time * time);//1166400f
-             * (vel * projectile.direction) * time * (float)Math.Cos(projectile.rotation);
-             */
             return projVector;
         }
 
         protected float PositionOffset(Vector2 targetposition)
-        {            
+        {
             float dist = projectile.Distance(targetposition);
             float magnitude = (float)Math.Sqrt((dist * dist) + (dist * dist)) * 0.16f;
             return magnitude;
@@ -696,8 +671,8 @@ namespace SplatoonMod.projectiles
                     }
                     else
                     {
-                        projectile.frame = 0;
                         FacePlayer();
+                        projectile.frame = 0;
                     }
                     break;
                 case InklingStates.RUN:
@@ -767,7 +742,7 @@ namespace SplatoonMod.projectiles
                     projectile.frame++;
                 }
                 else if (projectile.frame == endframe)
-                {                    
+                {
                     projectile.frame = startframe;
                 }
             }

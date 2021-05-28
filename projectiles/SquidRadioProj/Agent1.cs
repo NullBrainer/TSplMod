@@ -42,9 +42,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
         {
             base.SetDefaults();
             projectile.netImportant = true;
-            projectile.width = 45;//66
-            projectile.height = 45; //70
-            drawOriginOffsetY = -39;
+            drawOriginOffsetY = -53;
             drawOffsetX = -20;
             maxspeed = 10f;
             defaultInertia = 20f;

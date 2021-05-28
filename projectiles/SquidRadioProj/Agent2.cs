@@ -38,9 +38,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
         {
             base.SetDefaults();
             projectile.netImportant = true;
-            projectile.width = 40;//72
-            projectile.height = 40; //86
-            drawOriginOffsetY = -40;
+            drawOriginOffsetY = -49;
             drawOffsetX = -20;
             maxspeed = 10f;
             defaultInertia = 20f;
@@ -136,14 +134,14 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     {
                         if (SubActive)//(projectile.Distance(target) <= 480f)//
                         {
-                                SetInklingState(InklingStates.SUB);
+                            SetInklingState(InklingStates.SUB);
                         }
                         else
                         {
                             SetInklingState(InklingStates.PRIMARY);
                         }
                     }
-                    
+
 
 
                 }
@@ -154,18 +152,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 else
                 {
                     SetInklingState(InklingStates.FOLLOW);
-                }/*
-                else if (Math.Abs(projectile.position.X - player.position.X) >= FollowRange)//distanceToIdlePosition > FollowRange)//distanceToIdlePosition > FollowRange || (player.velocity.X < -1f || player.velocity.X > 1f) && player.velocity.X != 0)
-                {
-                    SetInklingState(InklingStates.FOLLOW);
-
                 }
-                else if ((projectile.velocity.X < 1f || projectile.velocity.X > -1f))// && distanceToIdlePosition < FollowRange)//(Math.Abs(projectile.position.X - player.position.X) <= FollowRange)
-                {
-                    SetInklingState(InklingStates.IDLE);
-
-                }*/
-
             }
         }
 

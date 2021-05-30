@@ -14,6 +14,7 @@ namespace SplatoonMod.projectiles.HeroProjectiles
     public class HeroRollerSplash : ModProjectile
     {
         private bool Gravity = false;
+        private int ReductionValue = 10;
         public override void SetStaticDefaults()
         {
             DisplayName.SetDefault("RollerSplash");
@@ -47,10 +48,6 @@ namespace SplatoonMod.projectiles.HeroProjectiles
         public override void AI()
         {
             projectile.rotation += 0.1f;
-            if (projectile.damage > 25)
-            {
-                projectile.damage -= 1;
-            }
             if (!Gravity)
             {
                 projectile.ai[0] += 1;
@@ -62,6 +59,16 @@ namespace SplatoonMod.projectiles.HeroProjectiles
             }
             else
             {
+                if (projectile.damage > 25)
+                {
+                    ReductionValue += (ReductionValue / 10);
+                    projectile.damage -= ReductionValue;
+                    if (projectile.damage < 25)
+                    {
+                        projectile.damage = 25;
+                    }
+                }
+
                 projectile.velocity.Y += 0.3f;
                 if (projectile.velocity.Y > 16f)
                 {

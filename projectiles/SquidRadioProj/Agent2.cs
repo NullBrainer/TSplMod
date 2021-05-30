@@ -39,17 +39,16 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             base.SetDefaults();
             projectile.netImportant = true;
             drawOriginOffsetY = -49;
-            drawOffsetX = -20;
+            drawOffsetX = -35;
             maxspeed = 10f;
             defaultInertia = 20f;
             CooldownLimit = 0f;
-            primaryprojectileespeed = 35f;
+            primaryprojectileespeed = 30f;
             projectilespeed = 16f;
             MaxSubTime = 30f;
             primaryAccuracy = 0f;
             subAccuracy = 20f;
             specialAccuracy = 20f;
-            distanceFromTarget = 320f;
             TargetDetectRange = 120f;
             AttackTypes = new SummonAttack[] { new SummonAttack(this, 1, 5, 90f), new SummonAttack(this, 15, 17, 15f), new SummonAttack(this, 18, 20, 10f) };
            
@@ -88,8 +87,8 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     float dist = projectile.Distance(dest);
                     float time = (dist / primaryprojectileespeed);
                     TargetingAngle = RadToDegree(projectile.DirectionTo(target).ToRotation());
-                    dest.Y -=  (3f*time)*0.5f;
-                    //dest.X += (time*projectile.direction);
+                    dest.Y +=  (-3f*time)*0.5f;
+                    dest.X += (targetnpc.velocity.X *time);
                    
                     projectileVector *= projectile.DirectionTo(dest);
                     //projectileVector = AimProjectile(target, primaryprojectileespeed, primaryprojectileespeed, primaryAccuracy);

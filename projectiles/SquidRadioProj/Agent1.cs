@@ -11,11 +11,12 @@ namespace SplatoonMod.projectiles.SquidRadioProj
 {
     /*
      TODO: Added reference to owner in Summon attack to update timer and play animation
+    fuckoffalready
      */
     public class Agent1 : InklingSummon
     {
 
-        private readonly int projectiles = 10;
+        private readonly int projectiles = 5;
 
         public override void OnHitNPC(NPC target, int damage, float knockback, bool crit)
         {
@@ -23,7 +24,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
         }
         public override void AI()
         {
-            SquidBuffType = ModContent.BuffType<SquidRadioBuff>();
+            SquidBuffType = ModContent.BuffType<SquidRadioBuff>();           
             base.AI();
         }
         public override void SetStaticDefaults()
@@ -35,23 +36,25 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
             ProjectileID.Sets.Homing[projectile.type] = true;
             CenteroffSet = projectile.Center;
-            
         }
 
         public override void SetDefaults()
         {
             base.SetDefaults();
+            projectile.width = 30;
             projectile.netImportant = true;
             drawOriginOffsetY = -53;
-            drawOffsetX = -20;
-            maxspeed = 10f;
-            defaultInertia = 20f;
+            drawOffsetX = -30;//facing right, +30 on left
+            maxspeed = 8f;
+            defaultInertia = 10f;
             CooldownLimit = 0f;
+            MaxSubTime = 45f;
             AttackTypes = new SummonAttack[] { new SummonAttack(this, 1, 3, 22f), new SummonAttack(this, 19, 21, 15f), new SummonAttack(this, 22, 24, 15f) };
             SpecialDuration = AttackTypes[2].GetDuration();
         }
         protected override void SetStates(Player player, float distanceToIdlePosition, Vector2 vectorToIdlePosition)
         {
+           
             if (distanceToIdlePosition > MaxDistance)
             {
                 SetInklingState(InklingStates.FLYING);
@@ -60,7 +63,8 @@ namespace SplatoonMod.projectiles.SquidRadioProj
             {
                 if (foundTarget)
                 {
-                    
+                    Vector2 positon = target;
+                    positon.X += 64f * projectile.direction;
                     if (SpecialActive(specialReq))
                     {
                         SetInklingState(InklingStates.SPECIAL);
@@ -72,9 +76,8 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                             SetInklingState(InklingStates.SUB);
                         }
                         else
-                        if ((Vector2.Distance(projectile.Center, target) <= 48f && (projectile.velocity.X < 7f || projectile.velocity.X > -7f)) || (InklingState != InklingStates.ROLLER_DOWN && Vector2.Distance(projectile.Center, target) > 48f))
+                        if ((Math.Abs(projectile.Center.X - positon.X) <= projectile.width*0.5f) || (InklingState != InklingStates.ROLLER_DOWN && Vector2.Distance(projectile.Center, target) > projectile.width))
                         {
-
                             SetInklingState(InklingStates.PRIMARY);
                         }
                     }
@@ -108,7 +111,7 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                 case InklingStates.IDLE:
                     projectile.velocity.X = 0f;
                     break;
-                case InklingStates.RUN:
+                case InklingStates.RUN:                   
                     projectile.velocity.X = Approach(target - projectile.Center).X;
                     break;
                 case InklingStates.FOLLOW:
@@ -152,9 +155,9 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     CooldownLimit = AttackTypes[2].GetDuration();
                     break;
                 case InklingStates.ROLLER_DOWN:
-                    speed = 10f;
-                    inertia = 30f;                   
-                    projectile.velocity.X = Approach(target - projectile.Center).X;
+                    Vector2 position = target;
+                    position.X +=  64f * projectile.direction;
+                    projectile.velocity.X = RollerMovement(position);
                     break;
                 case InklingStates.WAIT:
                     
@@ -163,10 +166,33 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                     break;
             }
         }
-       
+       private float RollerMovement(Vector2 targetpos)
+        {
+            //float result = 7.5f * projectile.direction;
+            
+            if (projectile.Distance(targetpos) >= 48f)
+            {
+                if (speed <= maxspeed) { 
+                speed += 1f;
+                }
+
+                inertia = 5f;
+            }
+            else
+            {
+                speed -=1f;
+                if (speed <= 7)
+                {
+                    speed = 8f;
+                }
+                inertia = 100f;                
+            }
+            return Approach(targetpos - projectile.Center).X;
+        }
+
         public override bool MinionContactDamage()
         {
-            return InklingState == InklingStates.ROLLER_DOWN && (projectile.velocity.X > 7f || projectile.velocity.X < -7f);
+            return InklingState == InklingStates.ROLLER_DOWN && (projectile.velocity.X > 6.5f || projectile.velocity.X < -6.5f);
         }
 
       
@@ -291,7 +317,6 @@ namespace SplatoonMod.projectiles.SquidRadioProj
                         projectile.velocity.X = 0f;
                     }
                     PlayerAnimation(AttackTypes[0].GetStartFrame(), AttackTypes[0].GetEndFrame());
-                    //AnimateState(AttackTypes[0].GetStartFrame(), AttackTypes[0].GetEndFrame(), InklingStates.WAIT);
                     break;
                 case InklingStates.JUMPING:
                     projectile.frame = 16;

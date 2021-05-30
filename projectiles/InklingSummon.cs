@@ -18,7 +18,7 @@ namespace SplatoonMod.projectiles
         protected Vector2 CenteroffSet;
         protected readonly float Gravity = 0.6f, TerminalVelocity = 10f;
         protected int SquidBuffType;
-        protected float TargetingAngle, TargetDetectRange, distanceFromTarget;
+        protected float TargetingAngle, TargetDetectRange, targetDistance;
         protected float speed, inertia, maxspeed, defaultInertia, defaultspeed, projectilespeed, primaryprojectileespeed, primaryAccuracy, subAccuracy, specialAccuracy;
         protected Vector2 target, FiringPosition;
         protected NPC targetnpc;
@@ -45,7 +45,6 @@ namespace SplatoonMod.projectiles
             Main.projPet[projectile.type] = true;
             ProjectileID.Sets.MinionSacrificable[projectile.type] = true;
             ProjectileID.Sets.Homing[projectile.type] = true;
-            CenteroffSet = projectile.Center;
         }
 
         public override void SetDefaults()
@@ -77,8 +76,8 @@ namespace SplatoonMod.projectiles
             primaryAccuracy = 20f;
             subAccuracy = 25f;
             specialAccuracy = 25f;
-            TargetDetectRange = 1000f;
-            distanceFromTarget = 240f;
+            TargetDetectRange = 400f;
+            targetDistance = 80f;
             AttackTypes = new SummonAttack[] { new SummonAttack(this, 1, 5, 6f), new SummonAttack(this, 16, 18, 10f), new SummonAttack(this, 16, 18, 6f) };//i dont wana put it here :C
         }
 
@@ -136,7 +135,7 @@ namespace SplatoonMod.projectiles
 
             target = projectile.position;
             foundTarget = false;
-            target = FindTarget(player, distanceFromTarget, target);
+            target = FindTarget(player, targetDistance, target);
 
 
 
@@ -186,6 +185,8 @@ namespace SplatoonMod.projectiles
             FrameSpeed = 7;
             inertia = defaultInertia;
             CenteroffSet = projectile.Center;
+            CenteroffSet.Y -= (projectile.height*0.5f);
+
         }
         protected virtual void UpdateInklingFlying(Vector2 playerposition, float distanceToIdlePosition)
         {
@@ -620,10 +621,24 @@ namespace SplatoonMod.projectiles
             {
                 projVector = new Vector2(Xcomp, Ycomp);
             }
+            /** Vector2 dest = targetposition;
+             dest.Y -= PositionOffset(targetposition) + targetnpc.velocity.Y;//(targetnpc.velocity.Y * targetnpc.velocity.Y) * targetnpc.directionY; 
+             dest.X += targetnpc.velocity.X * targetnpc.velocity.X * targetnpc.direction;
+             projVector *= projectile.DirectionTo(dest);
+            */
+            //
             Vector2 dest = targetposition;
-            dest.Y -= PositionOffset(targetposition) + targetnpc.velocity.Y;//(targetnpc.velocity.Y * targetnpc.velocity.Y) * targetnpc.directionY; 
-            dest.X += targetnpc.velocity.X * targetnpc.velocity.X * targetnpc.direction;
+            dest.X += (targetnpc.velocity.X * targetnpc.velocity.X) * targetnpc.direction;
+            dest.Y -= (targetnpc.velocity.Y * targetnpc.velocity.Y) * targetnpc.directionY;
+
+            float dist = projectile.Distance(dest);
+            float time = (dist / primaryprojectileespeed);
+            //TargetingAngle = RadToDegree(projectile.DirectionTo(dest).ToRotation());
+            dest.Y -= (3f * time) * 0.5f;
+            //dest.X += (time*projectile.direction);
+
             projVector *= projectile.DirectionTo(dest);
+
             return projVector;
         }
 
